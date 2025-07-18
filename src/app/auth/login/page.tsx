@@ -17,7 +17,7 @@ type LoginFormFields = {
 
 export default function LoginPage() {
   const router = useRouter();
-  const [passwordType, setPasswordType] = useState("password");
+  const [passwordType, setPasswordType] = useState<"password" | "text">("password");
   const [error, setError] = useState<string | null>(null);
   const {
     register,
@@ -26,7 +26,7 @@ export default function LoginPage() {
   } = useForm<LoginFormFields>({
     mode: "onBlur" // Validate fields when they lose focus
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const Login = async (data: any) => {
     setLoading(true);

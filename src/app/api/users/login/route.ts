@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/db/index";
 import User from "@/models/users.models";
 import { options } from '@/utils/constant'
+import { Session } from "inspector/promises";
 connectDB();
 // const generateToken=async(user:any)=>{
 //     const accessToken = await user.generateAccessToken();
@@ -48,9 +49,16 @@ export async function POST(request: NextRequest) {
                 }
             );
         }
-
-        const accessToken = await user.generateAccessToken();
-        const refreshToken = await user.generateRefreshToken();
+        const userUpdated = await User.findByIdAndUpdate(user._id, {
+            $set: { sessionId: new Date().getTime()
+                }
+        }, {
+            new: true
+        }
+        );
+        const newUser = await User.findById(user._id).select("-password -__v");
+        const accessToken = await newUser.generateAccessToken();
+        const refreshToken = await newUser.generateRefreshToken();
 
         if (!accessToken || !refreshToken) {
             return NextResponse.json(
@@ -62,6 +70,7 @@ export async function POST(request: NextRequest) {
                 }
             );
         }
+
 
 
         const response = NextResponse.json(
@@ -83,11 +92,11 @@ export async function POST(request: NextRequest) {
         });
 
         return response;
-        
+
     } catch (error) {
         return NextResponse.json(
             { message: "Internal server error", error }
-            ,{ status: 500 });
+            , { status: 500 });
     }
 
 }

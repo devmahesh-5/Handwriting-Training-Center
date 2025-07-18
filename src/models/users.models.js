@@ -71,7 +71,11 @@ const userSchema = new mongoose.Schema({
     otpExpiry: {
         type: Date
     },
-})
+    sessionId: {
+        type: Number,
+        default:new Date().getTime()
+    }
+},{ timestamps: true });
 
 
 
@@ -87,7 +91,9 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 }
 
 userSchema.methods.generateAccessToken =  function () {
-    return jwt.sign({ id: this._id },
+    console.log("the session id",this.sessionId);
+    
+    return jwt.sign({ id: this._id,sessionId:this.sessionId },
         process.env.ACCESS_TOKEN_SECRET, 
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
 }
