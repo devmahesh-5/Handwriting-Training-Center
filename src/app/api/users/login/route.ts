@@ -50,8 +50,9 @@ export async function POST(request: NextRequest) {
             );
         }
         const userUpdated = await User.findByIdAndUpdate(user._id, {
-            $set: { sessionId: new Date().getTime()
-                }
+            $set: {
+                sessionId: new Date().getTime()
+            }
         }, {
             new: true
         }
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
         if (!accessToken || !refreshToken) {
             return NextResponse.json(
                 {
-                    message: "could not generate tokens"
+                    message: "something went wrong error while generating tokens"
                 },
                 {
                     status: 500
