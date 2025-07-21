@@ -1,7 +1,7 @@
 import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/db/index";
 import User from "@/models/users.models.js";
-import {getDataFromToken} from "@/helpers/checkAuth"
+import getDataFromToken from "@/helpers/checkAuth"
 connectDB();
 
 export async function GET(request: NextRequest) {

@@ -8,7 +8,7 @@ import connectDB from "@/db/index";
 import User from "@/models/users.models";
 connectDB();
 
-export async function getDataFromToken(request: NextRequest) {
+export default async function getDataFromToken(request: NextRequest) {
     const accessToken = request.cookies.get("accessToken")?.value || "";
     if (!accessToken) {
         return null;
