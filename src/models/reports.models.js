@@ -15,6 +15,13 @@ const reportSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
+    status: {
+        type: String,
+        enum: ["pending", "resolved"],
+        default: "pending",
+    },
 },{timestamps : true});
+
+reportSchema.index({ student: 1, teacher: 1 }, { background: true });
 const Report = mongoose.models.Report || mongoose.model('Report', reportSchema);
 export default Report

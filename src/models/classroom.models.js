@@ -1,4 +1,4 @@
-import mongoose from mongoose;
+import mongoose from "mongoose";
 
 const classroomSchema = new mongoose.Schema({
     name: {
@@ -14,11 +14,13 @@ const classroomSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    students: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-    },
+    students: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        }
+    ],
     course: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',
@@ -46,6 +48,7 @@ const classroomSchema = new mongoose.Schema({
     timestamps: true
 });
 
+classroomSchema.index({ students: 1 },{ background: true });
 
 const Classroom = mongoose.models.Classroom || mongoose.model('Classroom', classroomSchema);
 export default Classroom;

@@ -19,12 +19,7 @@ import fs from "fs";
         } catch (error:any) {
             throw new Error(error.message);
         } finally {
-            // Always delete the local file, even if upload fails
-            try {
                 fs.unlinkSync(localFilePath);
-            } catch (err:any) {
-                throw new Error(`Failed to delete local file: ${err.message}`);
-            }
         }
     };
     

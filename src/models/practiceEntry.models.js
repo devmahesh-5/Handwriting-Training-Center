@@ -3,8 +3,7 @@ const practiceEntrySchema = new mongoose.Schema(
   {
     practice: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Practice',
-      required: true,
+      ref: 'Practice'
     },
     order: {
       type: Number,
@@ -23,3 +22,5 @@ const practiceEntrySchema = new mongoose.Schema(
 );
 
 const practiceEntry = mongoose.models.practiceEntry || mongoose.model("PracticeEntry",practiceEntrySchema)
+
+export default practiceEntry

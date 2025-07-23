@@ -32,5 +32,7 @@ const paymentSchema = new mongoose.Schema({
     timestamps: true
 });
 
+paymentSchema.index({ student: 1, Classroom: 1 }, { background: true });
+
 const Payment = mongoose.models.Payment || mongoose.model('Payment', paymentSchema);
 export default Payment

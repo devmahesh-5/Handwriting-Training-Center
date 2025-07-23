@@ -5,7 +5,7 @@ connectDB();
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
-    const isPublicPath = path.startsWith('/auth');
+    const isPublicPath = path === '/auth/login' || path === '/auth/register' || path === '/auth/forgot-password';
     
     const accessToken = request.cookies.get('accessToken')?.value || '';
     if(!accessToken && !isPublicPath) {
@@ -17,5 +17,5 @@ export function middleware(request: NextRequest) {
 }
  
 export const config = {
-  matcher: ['/','/users/:path*','/auth'],
+  matcher: ['/','/users/:path*','/auth/:path*'],
 }

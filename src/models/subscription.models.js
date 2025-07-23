@@ -34,5 +34,7 @@ const subscriptionSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Subscription = mongoose.model('Subscription', subscriptionSchema);
+subscriptionSchema.index({ student: 1, classroom: 1 }, { background: true });
+
+const Subscription =  mongoose.models.Subscription || mongoose.model('Subscription', subscriptionSchema);
 export default Subscription

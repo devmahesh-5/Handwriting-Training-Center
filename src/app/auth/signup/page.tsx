@@ -1,27 +1,37 @@
 "use client"
 import Logo from '@/components/LOGO';
 import Link from 'next/link';
-import { FaSpinner } from 'react-icons/fa';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { generateUsername } from 'unique-username-generator';
-
 import Input from '@/components/Input';
 import Select from '@/components/Select';
+
+// Color variables for easy customization
+const COLORS = {
+  primary: 'rgb(108, 72, 227)',       // #6C48E3
+  primaryHover: 'rgb(90, 58, 207)',    // #5a3acf
+  textDark: 'rgb(8, 39, 65)',          // #082741
+  textLight: '#0A2843',     // #F2F4F7
+  error: 'rgb(220, 38, 38)',           // #dc2626
+  errorLight: 'rgb(254, 242, 242)',    // #fef2f2
+  border: 'rgb(229, 231, 235)',        // #e5e7eb
+  gray: 'rgb(107, 114, 128)',          // #6b7280
+  grayLight: 'rgb(243, 244, 246)'      // #f3f4f6
+};
 
 type SignupFormFields = {
   fullName: string;
   email: string;
   username: string;
   password: string;
-  address: string;
   phone: string;
   gender: string;
-  profilePicture?: FileList;
-  role?: string;
+  profilePicture?: FileList | null;
+  role: string;
 };
 
 export default function SignupPage() {
@@ -31,14 +41,15 @@ export default function SignupPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors } // Access validation errors
+    formState: { errors },
+    watch
   } = useForm<SignupFormFields>({
     defaultValues: { username: generateUsername() },
-    mode: "onBlur" // Validate fields when they lose focus
+    mode: "onBlur"
   });
   const [loading, setLoading] = useState(false);
 
-  const signUp = async (data: any) => {
+  const signUp = async (data: SignupFormFields) => {
     setLoading(true);
     setError(null);
     const formData = new FormData();
@@ -47,7 +58,6 @@ export default function SignupPage() {
     formData.append("password", data.password);
     formData.append("phone", data.phone);
     formData.append("gender", data.gender);
-    formData.append("address", data.address);
     formData.append("username", data.username);
     formData.append("role", data.role);
     if (data.profilePicture && data.profilePicture.length > 0) {
@@ -55,14 +65,14 @@ export default function SignupPage() {
     }
     try {
       const userSession = await axios.post('/api/users/register', formData);
-      if (userSession.status==200) {
+      if (userSession.status === 200) {
         setLoading(false);
         router.push('/auth/login');
       }
-      toast.success("User Signup successful");
+      toast.success("Account created successfully!");
     } catch (error: any) {
-      console.error("error occurred", error);
-      setError(error?.response?.data?.message || "Signup failed");
+      console.error("Signup error:", error);
+      setError(error?.response?.data?.message || "Signup failed. Please try again.");
       toast.error(error?.response?.data?.message || "Signup failed");
     } finally {
       setLoading(false);
@@ -70,45 +80,55 @@ export default function SignupPage() {
   };
 
   return !loading ? (
-    <div className="w-full min-h-screen flex items-center justify-center bg-[#F2F4F7] p-4">
-      <div className="w-full max-w-2xl bg-[#F2F4F7] rounded-2xl shadow-lg p-8">
-        <div className="mb-6 flex justify-center">
-          <span className="inline-block w-24">
+    <div className={`w-full min-h-screen flex items-center justify-center p-4 bg-gray-100`}>
+      <div className={`w-full max-w-4xl rounded-xl bg-${ COLORS.textLight } shadow-md p-8`}>
+        <div className="mb-8 flex justify-center">
+          <span className="inline-block w-28">
             <Logo />
           </span>
         </div>
 
-        <h2 className="text-center text-3xl font-bold text-[#082741] mb-2">
-          Create Your Account
-        </h2>
-
-        <p className="text-center text-gray-600 mb-8">
-          Join our community and start your journey
-        </p>
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold mb-2" style={{ color: COLORS.textDark }}>
+            Create Your Account
+          </h2>
+          <p className="text-sm" style={{ color: COLORS.gray }}>
+            Join our platform and start your journey
+          </p>
+        </div>
 
         {error && (
-          <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-center">
+          <div className="mb-6 p-3 rounded-lg text-sm flex items-center" 
+               style={{ backgroundColor: COLORS.errorLight, color: COLORS.error, borderColor: COLORS.error }}>
+            <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit(signUp)}>
-
+        <form onSubmit={handleSubmit(signUp)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-            <div className={`space-y-5`}>
+            {/* Left Column */}
+            <div className="space-y-5">
               <Input
                 type="text"
                 label="Full Name"
-                placeholder="Ram Bahadur"
-                {...register("fullName", { required: "Full name is required" })}
+                placeholder="John Doe"
+                {...register("fullName", { 
+                  required: "Full name is required",
+                  minLength: {
+                    value: 2,
+                    message: "Name must be at least 2 characters"
+                  }
+                })}
                 error={errors.fullName?.message}
               />
 
               <Input
                 type="email"
                 label="Email Address"
-                placeholder="rambhadur@gmail.com"
+                placeholder="john@example.com"
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
@@ -122,12 +142,20 @@ export default function SignupPage() {
               <Input
                 type="text"
                 label="Username"
-                placeholder="ram_bahadur"
+                placeholder="john_doe"
                 {...register("username", {
                   required: "Username is required",
                   minLength: {
                     value: 3,
                     message: "Username must be at least 3 characters"
+                  },
+                  maxLength: {
+                    value: 20,
+                    message: "Username must be less than 20 characters"
+                  },
+                  pattern: {
+                    value: /^[a-zA-Z0-9_]+$/,
+                    message: "Username can only contain letters, numbers and underscores"
                   }
                 })}
                 error={errors.username?.message}
@@ -153,34 +181,34 @@ export default function SignupPage() {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-[38px] p-1 text-[#6C48E3] hover:text-indigo-600 transition-colors focus:outline-none rounded-md"
+                  className={`absolute right-3 top-[38px] p-1 rounded-md focus:outline-none text-${COLORS.primary} text-gray-600`}
                   onClick={() => setPasswordType(passwordType === 'password' ? 'text' : 'password')}
                   aria-label={passwordType === 'password' ? 'Show password' : 'Hide password'}
                 >
                   {passwordType !== 'password' ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                     </svg>
                   )}
                 </button>
               </div>
 
-              <div className="mt-2 text-sm text-gray-600">
-                <p>Password must contain:</p>
-                <ul className="list-disc pl-5 space-y-1">
+              <div className="text-xs" style={{ color: COLORS.gray }}>
+                <p className="font-medium">Password requirements:</p>
+                <ul className="list-disc pl-4 space-y-1 mt-1">
                   <li>8-20 characters</li>
-                  <li>At least one letter</li>
-                  <li>At least one number</li>
+                  <li>At least one letter and number</li>
+                  <li>No special characters required</li>
                 </ul>
               </div>
             </div>
 
-            {/* Right Column - Always visible */}
+            {/* Right Column */}
             <div className="space-y-5">
               <Input
                 type="tel"
@@ -192,17 +220,13 @@ export default function SignupPage() {
                   pattern: {
                     value: /^[0-9]{10}$/,
                     message: "Invalid phone number (10 digits required)"
-                  },
-                  validate: (value) => {
-                    if (value.length !== 10) return "Invalid phone number (10 digits required)";
-                    return true;
                   }
                 })}
                 error={errors.phone?.message}
               />
 
               <Select
-                options={["Male", "Female"]}
+                options={["Male", "Female", "Other"]}
                 label="Gender"
                 className="w-full"
                 error={errors.gender?.message}
@@ -210,57 +234,87 @@ export default function SignupPage() {
               />
 
               <Select
-                options={["Student", "Teacher"]}
+                options={["Student", "Teacher", "Admin"]}
                 label="Role"
                 className="w-full"
                 error={errors.role?.message}
                 {...register("role", { required: "Role is required" })}
               />
-              <div className="space-y-4">
-                <span className="text-sm font-bold text-[#6C48E3]">optional fields</span>
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-gray-700">Profile Picture</label>
-                  <input
-                    type="file"
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#6C48E3] file:text-white hover:file:bg-[#5a3acf]"
-                    {...register("profilePicture")}
-                    multiple={false}
-                    accept="image/*"
-                  />
-                  {errors.profilePicture && (
-                    <p className="mt-1 text-sm text-red-600">{errors.profilePicture.message}</p>
-                  )}
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium" style={{ color: COLORS.textDark }}>
+                  Profile Picture <span className="text-xs" style={{ color: COLORS.gray }}>(Optional)</span>
+                </label>
+                <div className="mt-1 flex items-center">
+                  <label className="flex flex-col items-center px-4 py-2 rounded-lg border border-dashed cursor-pointer hover:bg-gray-50 transition-colors" style={{ borderColor: COLORS.border }}>
+                    <svg className="h-8 w-8 mb-1" style={{ color: COLORS.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-xs text-center" style={{ color: COLORS.gray }}>
+                      {watch('profilePicture')  // solve the issue
+
+                        ? watch('profilePicture')?.[0]?.name 
+                        : 'Click to upload (JPG, PNG)'}
+                    </span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      {...register("profilePicture")}
+                      accept="image/jpeg,image/png"
+                    />
+                  </label>
                 </div>
-
-
+                {errors.profilePicture && (
+                  <p className="mt-1 text-xs" style={{ color: COLORS.error }}>
+                    {errors.profilePicture.message}
+                  </p>
+                )}
               </div>
             </div>
           </div>
 
+          <div className="flex items-center">
+            <input
+              id="terms"
+              type="checkbox"
+              className="h-4 w-4 rounded focus:ring-0"
+              style={{ borderColor: COLORS.border, color: COLORS.primary }}
+              required
+            />
+            <label htmlFor="terms" className="ml-2 block text-sm" style={{ color: COLORS.gray }}>
+              I agree to the <a href="#" className="font-medium" style={{ color: COLORS.primary }}>Terms of Service</a> and <a href="#" className="font-medium" style={{ color: COLORS.primary }}>Privacy Policy</a>
+            </label>
+          </div>
+
           <button
             type="submit"
-            className="text-[#6C48E3] w-full mt-8 py-3 font-semibold rounded-lg transition-all border border-[#6C48E3]
-            bg-white hover:bg-[#6C48E3] hover:text-white focus:ring-2 focus:ring-[#6C48E3] focus:ring-offset-2"
+            className="w-full py-3 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: Object.keys(errors).length > 0 ? `${COLORS.primary}80` : COLORS.primary,
+              color: COLORS.textLight,
+              borderColor: COLORS.primary,
+            }}
             disabled={Object.keys(errors).length > 0}
           >
             Create Account
           </button>
         </form>
 
-        <p className="mt-6 text-center text-gray-600">
-          Already have an account?{" "}
-          <Link
-            href="/auth/login"
-            className="font-semibold text-[#6C48E3] hover:text-[#5a3acf] transition-colors"
-          >
-            Sign In
+        <div className="mt-6 text-center text-sm" style={{ color: COLORS.gray }}>
+          Already have an account?{' '}
+          <Link href="/auth/login" className="font-medium" style={{ color: COLORS.primary }}>
+            Sign in
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   ) : (
-    <div className={`animate-spin`}>
-      <FaSpinner />
+    <div className="w-full min-h-screen flex items-center justify-center">
+      <div className="animate-spin" style={{ color: COLORS.primary }}>
+        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      </div>
     </div>
-  )
+  );
 }

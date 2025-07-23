@@ -17,8 +17,6 @@ export default async function getDataFromToken(request: NextRequest) {
     try {
         const decodedToken:any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET!);
         const user = await User.findById(decodedToken.id).select("-password -__v");
-                console.log(decodedToken,"thiss");
-                
                 if (!user) {
                     throw new Error("User not found");
                 }

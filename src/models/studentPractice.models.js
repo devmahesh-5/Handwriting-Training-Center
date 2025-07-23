@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 const studentSolutionSchema = new mongoose.Schema({
   student: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // assuming students are in User model
+    ref: "User", // students are in User model
     required: true,
   },
   practice: {
@@ -12,23 +12,25 @@ const studentSolutionSchema = new mongoose.Schema({
     ref: "Practice",
     required: true,
   },
-  course: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Course",
-    required: true,
-  },
   status: {
     type: String,
     enum: ["pending", "submitted", "reviewed"],
     default: "pending",
   },
-  image:{
-    type:String,
-
+  submissionFile: {
+    type: String
   },
-  submissionFile: { type: String }, 
-  feedback: { type: String }, 
-  marks: { type: Number },    
+  feedback: {
+    type: String
+  },
+  marks: {
+    type: Number
+  },
+  classroom: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Classroom",
+    required: true,
+  }
 }, {
   timestamps: true
 });

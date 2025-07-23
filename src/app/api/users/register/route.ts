@@ -6,6 +6,7 @@ import uploadOnCloudinary from "@/helpers/cloudinary";
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from 'uuid';
+import { ApiError } from "@/utils/ApiError";
 connectDB();
 
 export async function POST(request: NextRequest) {
@@ -20,25 +21,24 @@ export async function POST(request: NextRequest) {
         const role = formData.get('role') as string;
         const phone = formData.get('phone') as string;
         const gender = formData.get('gender') as string;
-        if ([fullName, email, password, username, role, phone,gender].some(field => !field)) {
-            return NextResponse.json(
-                { message: "All fields are required" }
-                ,{ status: 400 });
+        if ([fullName, email, password, username, role, phone, gender].some(field => !field)) {
+            throw new ApiError(400, "All fields are required");
         }
 
         const existingUser = await mongoose.models.User.findOne({ email });
         if (existingUser) {
-            return NextResponse.json(
-                { message: "User already exists" }
-                , { status: 400 });
+            throw new ApiError(400, "User already exists");
         }
         // Configure Cloudinary
         let uploadedProfile = null;
         if (profilePicture) {
             const buffer = Buffer.from(await profilePicture.arrayBuffer());
-            const tempFilePath = path.join(process.cwd(), "temp_"+uuidv4() + profilePicture.name);
+            const tempFilePath = path.join(process.cwd(), "temp_" + uuidv4() + profilePicture.name);
             fs.writeFileSync(tempFilePath, buffer);
             uploadedProfile = await uploadOnCloudinary(tempFilePath);
+            if (!uploadedProfile) {
+                throw new ApiError(500, "Failed to upload profile picture");
+            }
         }
 
         const newUser = new User({
@@ -56,10 +56,16 @@ export async function POST(request: NextRequest) {
             { message: "User registered successfully" }
             , { status: 201 });
 
-    } catch (error) {
+    } catch (error: unknown) {
         return NextResponse.json(
-            { message: "Internal server error",error }
-            , { status: 500 });
+            {
+                message:
+                    error instanceof ApiError ? error.message : "Error registering user"
+            }
+            , {
+                status:
+                    error instanceof ApiError ? error.statusCode : 500
+            });
     }
 
 }

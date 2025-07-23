@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/db/index";
 import User from "@/models/users.models";
-import { options } from '@/utils/constant'
-import { Session } from "inspector/promises";
+import { ApiError } from "@/utils/ApiError";
 connectDB();
 // const generateToken=async(user:any)=>{
 //     const accessToken = await user.generateAccessToken();
@@ -26,28 +25,19 @@ export async function POST(request: NextRequest) {
     try {
         const { email, password } = await request.json();
         if ([email, password].some(field => !field)) {
-            return NextResponse.json(
-                { message: "All fields are required" }
-                , { status: 400 });
+            throw new ApiError(400, "All fields are required");
         }
 
         const user = await User.findOne({ email });
         if (!user) {
-            return NextResponse.json(
-                { message: "User not registered.please register before logging in" }
-                , { status: 404 });
+            throw new ApiError(404, "User not found");
         }
-
-        const isPasswordCorrect = user.isPasswordCorrect(password);
+        const isPasswordCorrect = await user.isPasswordCorrect(password);
+        console.log('====================================');
+        console.log(isPasswordCorrect);
+        console.log('====================================');
         if (!isPasswordCorrect) {
-            return NextResponse.json(
-                {
-                    message: "invalid password"
-                },
-                {
-                    status: 400
-                }
-            );
+            throw new ApiError(401, "Invalid password");
         }
         const userUpdated = await User.findByIdAndUpdate(user._id, {
             $set: {
@@ -62,14 +52,7 @@ export async function POST(request: NextRequest) {
         const refreshToken = await newUser.generateRefreshToken();
 
         if (!accessToken || !refreshToken) {
-            return NextResponse.json(
-                {
-                    message: "something went wrong error while generating tokens"
-                },
-                {
-                    status: 500
-                }
-            );
+            throw new ApiError(500, "Could not generate tokens");
         }
 
 
@@ -94,10 +77,15 @@ export async function POST(request: NextRequest) {
 
         return response;
 
-    } catch (error) {
-        return NextResponse.json(
-            { message: "Internal server error", error }
-            , { status: 500 });
+    } catch (error: unknown) {
+        return NextResponse.
+            json(
+                {
+                    message: error instanceof ApiError ? error.message : "Something went wrong"
+                }
+                , {
+                    status: error instanceof ApiError ? error.statusCode : 500
+                });
     }
 
 }

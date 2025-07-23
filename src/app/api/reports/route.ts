@@ -28,7 +28,34 @@ export async function GET(request: NextRequest) {
 
                 });
         }
-        const reports = await Report.find({ teacher: user._id });
+        const reports = await Report.aggregate(
+            [
+                {
+                    $lookup:{
+                        from:"users",
+                        localField:"student",
+                        foreignField:"_id",
+                        as:"student"
+                    }
+                },
+                {
+                    $lookup:{
+                        from:"users",
+                        localField:"teacher",
+                        foreignField:"_id",
+                        as:"teacher"
+                    }
+                },
+                {
+                    $project:{
+                        student:{$arrayElemAt:["$student",0]},
+                        report:1,
+                        teacher:{$arrayElemAt:["$teacher",0]},
+                        status:1
+                    }
+                }
+            ]
+        )
         return NextResponse.
             json({
                 message: "Reports fetched successfully", reports
