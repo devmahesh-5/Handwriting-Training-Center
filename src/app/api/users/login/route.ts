@@ -33,9 +33,7 @@ export async function POST(request: NextRequest) {
             throw new ApiError(404, "User not found");
         }
         const isPasswordCorrect = await user.isPasswordCorrect(password);
-        console.log('====================================');
-        console.log(isPasswordCorrect);
-        console.log('====================================');
+
         if (!isPasswordCorrect) {
             throw new ApiError(401, "Invalid password");
         }
@@ -54,8 +52,6 @@ export async function POST(request: NextRequest) {
         if (!accessToken || !refreshToken) {
             throw new ApiError(500, "Could not generate tokens");
         }
-
-
 
         const response = NextResponse.json(
             {

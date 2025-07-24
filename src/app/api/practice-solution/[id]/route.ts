@@ -3,42 +3,26 @@ import connectDB from "@/db/index";
 import { NextResponse, NextRequest } from "next/server";
 import getDataFromToken from "@/helpers/checkAuth";
 import mongoose, { isValidObjectId } from "mongoose";
+import { ApiError } from "@/utils/ApiError";
+import User from "@/models/users.models";
 
 connectDB();
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     try {
-        const user = await getDataFromToken(request);
+        const { _id: userId } = await getDataFromToken(request);
+
+        const user = await User.findById(userId);
         if (!user) {
-            return NextResponse.json(
-                {
-                    message: "Unauthenticated User",
-                },
-                {
-                    status: 401,
-                }
-            );
+            throw new ApiError(404, "User not found");
         }
         if (user.isVerified === false) {
-            return NextResponse.json(
-                {
-                    message: "User is not verified",
-                },
-                {
-                    status: 401,
-                }
-            );
+            throw new ApiError(400, "User is not verified");
         }
         const { id } = params;
-        if(!isValidObjectId(id)){
-            return NextResponse.json(
-                {
-                    message: "Invalid practice solution ID",
-                },
-                {
-                    status: 400,
-                }
-            );
+
+        if (!isValidObjectId(id)) {
+            throw new ApiError(404, "invalid practice solution id");
         }
 
         const solutions = await StudentSolution.aggregate([
@@ -91,54 +75,47 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             }, {
                 status: 200
             });
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error getting practice:", error);
         return NextResponse.
             json({
-                message: "Error getting practice"
+                message: error instanceof ApiError ? error.message : "Error getting practice"
             },
                 {
-                    status: 500
+                    status: error instanceof ApiError ? error.statusCode : 500
 
                 });
     }
 }
 
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string} }) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
     try {
+        //for teacher marking
         const { id } = params;
-        // const studentId = request.nextUrl.searchParams.get("studentId");
-        const user = await getDataFromToken(request);
-        if (!user || !isValidObjectId(id)) {
-            return NextResponse.json(
-                {
-                    message: "Unauthenticated User",
-                },
-                {
-                    status: 401,
-                }
-            );
-        }
-        if (!user.isVerified || user.role !== "teacher") {
-            return NextResponse.json(
-                {
-                    message: "User not authorized to mark the practice solution",
-                },
-                {
-                    status: 401,
-                }
-            );
-        }
         const { status, feedback, marks } = await request.json();
+        // const studentId = request.nextUrl.searchParams.get("studentId");
+        const { _id: userId } = await getDataFromToken(request);
+
+        const user = await User.findById(userId);
+
+
+        if (!user || !isValidObjectId(id)) {
+            throw new ApiError(404, "User not Found")
+        }
+
+        if (!user.isVerified || user.role !== "teacher") {
+            throw new ApiError(401, "User not authorized to mark the practice solution")
+        }
+
         const updatedPracticeSolution = await StudentSolution.findByIdAndUpdate(id, {
-            $set :{
+            $set: {
                 status,
                 feedback,
                 marks
             }
-        }, { 
-            new: true 
+        }, {
+            new: true
         });
 
         return NextResponse.
@@ -149,13 +126,15 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
                 status: 200
             });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+
         return NextResponse
             .json({
-                message: error.message || "Error updating practice",
+                message: error instanceof ApiError ? error.message : "Error updating practice",
             },
                 {
-                    status: 500
+                    status: error instanceof ApiError ? error.statusCode : 500
                 });
     }
 }
+

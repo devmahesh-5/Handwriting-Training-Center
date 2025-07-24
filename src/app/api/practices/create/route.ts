@@ -5,6 +5,7 @@ import Practice from "@/models/practice.models";
 import getDataFromToken from "@/helpers/checkAuth";
 import { saveBuffer } from "@/utils/saveBuffer";
 import uploadOnCloudinary from "@/helpers/cloudinary";
+import { ApiError } from "@/utils/ApiError";
 
 connectDB();
 
@@ -15,36 +16,34 @@ export async function POST(request: NextRequest) {
     const image = formData.get("image") as File;
     const video = formData.get("video") as File;
     const teacher = await getDataFromToken(request);
+
     if (!teacher) {
-        return NextResponse.
-            json({
-                message: "Unauthenticated User"
-            }, {
-                status: 401
-            });
+       throw new ApiError(404,"user not Found");
     }
+
     if (teacher.isVerified === false || teacher.role !== "teacher") {
-        return NextResponse.json({
-            message: "User is not verified"
-        }, {
-            status: 401
-        });
+        throw new ApiError(400,"user not verified")
     }
+
     let uploadedImage = null;
     let uploadedVideo = null;
+
     if (image instanceof File && image.size > 0) {
+
         const tempFilePath = await saveBuffer(image);
         uploadedImage = await uploadOnCloudinary(tempFilePath);
         if (!uploadedImage) {
             return NextResponse.json({ message: "Error uploading image" }, { status: 500 });
         }
+
     }
 
     if (video instanceof File && video.size > 0) {
+
         const tempFilePath = await saveBuffer(video);
         uploadedVideo = await uploadOnCloudinary(tempFilePath);
         if (!uploadedVideo) {
-            return NextResponse.json({ message: "Error uploading video" }, { status: 500 });
+            throw new ApiError(500, "Error uploading video");
         }
     }
 
@@ -62,16 +61,15 @@ export async function POST(request: NextRequest) {
             },
                 {
                     status: 201
-
                 });
-    } catch (error) {
+    } catch (error:unknown) {
         console.error("Error creating practice:", error);
         return NextResponse.
             json({
-                message: "Error creating practice"
+                message: error instanceof ApiError ? error.message : "Error creating practice"
 
             }, {
-                status: 500
+                status: error instanceof ApiError ? error.statusCode : 500
 
             });
     }
