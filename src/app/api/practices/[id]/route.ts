@@ -57,6 +57,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
         }
 }
 
+//needs to review
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
     try {
         const body = await req.json();

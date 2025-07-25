@@ -26,12 +26,11 @@ const courseSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    practiceSet: [
-        {
-            type: practiceEntrySchema,
-            default: [],
-        },
-    ]
+    practiceSet: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PracticeSet',
+        required: true
+    }
 
 }, { timestamps: true });
 

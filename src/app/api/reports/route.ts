@@ -2,31 +2,18 @@ import Report from "@/models/reports.models";
 import connectDB from "@/db/index";
 import { NextResponse, NextRequest } from "next/server";
 import getDataFromToken from "@/helpers/checkAuth";
+import { ApiError } from "@/utils/ApiError";
+import { isValidObjectId } from "mongoose";
 connectDB();
 
 export async function GET(request: NextRequest) {
     try {
         const user = await getDataFromToken(request);
         if (!user) {
-
-            return NextResponse.
-                json({
-                    message: "Unauthenticated User"
-
-                }, {
-                    status: 401
-
-                });
+        throw new ApiError(401, "User Session expired or not logged in");
         }
         if (user.isVerified === false) {
-            return NextResponse.
-                json({
-                    message: "User is not verified"
-
-                }, {
-                    status: 401
-
-                });
+            throw new ApiError(401, "User is not verified");
         }
         const reports = await Report.aggregate(
             [
@@ -62,14 +49,14 @@ export async function GET(request: NextRequest) {
             }, {
                 status: 200
             });
-    } catch (error) {
+    } catch (error:unknown) {
         console.error("Error getting reports:", error);
         return NextResponse.
             json({
-                message: "Error getting reports"
+                message: error instanceof ApiError ? error.message : "Error getting reports"
 
             }, {
-                status: 500
+                status: error instanceof ApiError ? error.statusCode : 500
 
             });
     }
