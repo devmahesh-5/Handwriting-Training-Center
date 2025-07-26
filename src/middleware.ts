@@ -1,7 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server'
-import connectDB from './db/index';
 
-connectDB();
 
 
 // This function can be marked `async` if using `await` inside
