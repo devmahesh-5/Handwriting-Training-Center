@@ -7,21 +7,24 @@ connectDB();
 
 export async function GET(request: NextRequest) {
     try {
-
-
-        const user = await getDataFromToken(request);
+        const { _id: userId } = await getDataFromToken(request);
+        if(!userId){
+            throw new ApiError(401, "User Session expired or not logged in");
+        }
+        
+        const user = await User.findById(userId).select("-password -sessionId -__v -refreshToken -createdAt -updatedAt -forgetPasswordToken -forgetPasswordExpiry -verifyToken -verifyTokenExpiry -unVerified_at -verificationAttempts");
 
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");
         }
         const response = NextResponse.json({
             message: "User profile fetched successfully",
-            data: user
+            user
         }, { status: 200 });
 
         return response;
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Error getting user ID from token:", error);
         return NextResponse.
             json({

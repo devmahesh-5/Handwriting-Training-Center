@@ -34,7 +34,7 @@ export default function LoginPage() {
       const userSession = await axios.post('/api/users/login', data);
       if (userSession.status==200) {
         setLoading(false);
-        router.push('/users/me');
+        router.push('/');
       }
       toast.success("User SignIn successful");
     } catch (error: any) {
@@ -47,8 +47,8 @@ export default function LoginPage() {
   };
 
 return !loading ? (
-  <div className="w-full min-h-screen flex items-center justify-center bg-gray-50 p-4">
-    <div className="w-full max-w-md bg-white rounded-xl shadow-sm p-8 border border-gray-100">
+  <div className="w-full min-h-screen flex items-center justify-center bg-gray-50 p-4 dark:bg-gray-900">
+    <div className="w-full max-w-md bg-white rounded-xl shadow-sm p-8 border border-gray-100 dark:bg-gray-800">
       <div className="mb-8 flex justify-center">
         <span className="inline-block w-28">
           <Logo />
@@ -56,10 +56,10 @@ return !loading ? (
       </div>
 
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-1">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-1 dark:text-white">
           Welcome back
         </h2>
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-500 text-sm dark:text-[#F2F4F7]">
           Enter your credentials to access your account
         </p>
       </div>
@@ -80,14 +80,14 @@ return !loading ? (
 
       <form onSubmit={handleSubmit(Login)} className="space-y-5">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#F2F4F7]">
             Email address
           </label>
           <div className="relative">
             <input
               id="email"
               type="email"
-              className={`text-black block w-full px-3 py-2.5 border ${errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm transition-colors`}
+              className={`text-black block w-full px-3 py-2.5 border ${errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm transition-colors dark:bg-[#F2F4F7] dark:text-[#F2F4F7] dark:placeholder-[#F2F4F7] dark:bg-gray-800`}
               placeholder="you@example.com"
               {...register("email", {
                 required: "Email is required",
@@ -111,7 +111,7 @@ return !loading ? (
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 dark:text-[#F2F4F7]">
             Password
           </label>
           <div className="relative">
@@ -170,7 +170,7 @@ return !loading ? (
               type="checkbox"
               className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
             />
-            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-[#F2F4F7]">
               Remember me
             </label>
           </div>
@@ -197,7 +197,7 @@ return !loading ? (
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">
+            <span className="px-2] bg-white text-gray-500 dark:text-[#F2F4F7] dark:bg-gray-800">
               Don't have an account?
             </span>
           </div>
@@ -206,7 +206,7 @@ return !loading ? (
         <div className="mt-6">
           <Link
             href="/auth/signup"
-            className="w-full flex justify-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+            className="w-full flex justify-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors dark:text-[#F2F4F7] dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             Sign up
           </Link>

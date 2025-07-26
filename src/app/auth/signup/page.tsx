@@ -10,19 +10,6 @@ import { generateUsername } from 'unique-username-generator';
 import Input from '@/components/Input';
 import Select from '@/components/Select';
 
-// Color variables for easy customization
-const COLORS = {
-  primary: 'rgb(108, 72, 227)',       // #6C48E3
-  primaryHover: 'rgb(90, 58, 207)',    // #5a3acf
-  textDark: 'rgb(8, 39, 65)',          // #082741
-  textLight: '#0A2843',     // #F2F4F7
-  error: 'rgb(220, 38, 38)',           // #dc2626
-  errorLight: 'rgb(254, 242, 242)',    // #fef2f2
-  border: 'rgb(229, 231, 235)',        // #e5e7eb
-  gray: 'rgb(107, 114, 128)',          // #6b7280
-  grayLight: 'rgb(243, 244, 246)'      // #f3f4f6
-};
-
 type SignupFormFields = {
   fullName: string;
   email: string;
@@ -80,8 +67,9 @@ export default function SignupPage() {
   };
 
   return !loading ? (
-    <div className={`w-full min-h-screen flex items-center justify-center p-4 bg-gray-100`}>
-      <div className={`w-full max-w-4xl rounded-xl bg-${ COLORS.textLight } shadow-md p-8`}>
+    <div className={`w-full min-h-screen flex items-center justify-center p-4 bg-light-200 dark:bg-[#0f0d23]`}>
+
+      <div className={`w-full max-w-4xl rounded-xl shadow-md p-8`}>
         <div className="mb-8 flex justify-center">
           <span className="inline-block w-28">
             <Logo />
@@ -89,17 +77,16 @@ export default function SignupPage() {
         </div>
 
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold mb-2" style={{ color: COLORS.textDark }}>
+          <h2 className="text-2xl font-bold mb-2 text-primary dark:text-[#F2F4F7]">
             Create Your Account
           </h2>
-          <p className="text-sm" style={{ color: COLORS.gray }}>
+          <p className="text-sm text-gray-600 dark:text-[#F2F4F7]">
             Join our platform and start your journey
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-3 rounded-lg text-sm flex items-center" 
-               style={{ backgroundColor: COLORS.errorLight, color: COLORS.error, borderColor: COLORS.error }}>
+          <div className="mb-6 p-3 rounded-lg text-sm flex items-center text-red-600 bg-red-200">
             <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
@@ -107,7 +94,7 @@ export default function SignupPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(signUp)} className="space-y-6">
+        <form onSubmit={handleSubmit(signUp)} className="space-y-6 dark:text-[#F2F4F7]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left Column */}
             <div className="space-y-5">
@@ -150,7 +137,7 @@ export default function SignupPage() {
                     message: "Username must be at least 3 characters"
                   },
                   maxLength: {
-                    value: 20,
+                    value: 30,
                     message: "Username must be less than 20 characters"
                   },
                   pattern: {
@@ -174,6 +161,7 @@ export default function SignupPage() {
                       if (value.length > 20) return "Maximum 20 characters";
                       if (!/[A-Za-z]/.test(value)) return "Must include a letter";
                       if (!/\d/.test(value)) return "Must include a number";
+                      if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) return "Must include a special character";
                       return true;
                     }
                   })}
@@ -181,7 +169,7 @@ export default function SignupPage() {
                 />
                 <button
                   type="button"
-                  className={`absolute right-3 top-[38px] p-1 rounded-md focus:outline-none text-${COLORS.primary} text-gray-600`}
+                  className={`absolute right-3 top-[38px] p-1 rounded-md focus:outline-none text-gray-400 hover:text-gray-600`}
                   onClick={() => setPasswordType(passwordType === 'password' ? 'text' : 'password')}
                   aria-label={passwordType === 'password' ? 'Show password' : 'Hide password'}
                 >
@@ -198,12 +186,12 @@ export default function SignupPage() {
                 </button>
               </div>
 
-              <div className="text-xs" style={{ color: COLORS.gray }}>
+              <div className="text-xs text-gray-600 dark:text-[#F2F4F7]">
                 <p className="font-medium">Password requirements:</p>
                 <ul className="list-disc pl-4 space-y-1 mt-1">
                   <li>8-20 characters</li>
                   <li>At least one letter and number</li>
-                  <li>No special characters required</li>
+                  <li>At least one special characters required</li>
                 </ul>
               </div>
             </div>
@@ -242,15 +230,15 @@ export default function SignupPage() {
               />
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium" style={{ color: COLORS.textDark }}>
-                  Profile Picture <span className="text-xs" style={{ color: COLORS.gray }}>(Optional)</span>
+                <label className="block text-sm font-medium text-gray-700 dark:text-[#F2F4F7]">
+                  Profile Picture <span className="text-xs text-gray-500 dark:text-gray-400">(Optional)</span>
                 </label>
                 <div className="mt-1 flex items-center">
-                  <label className="flex flex-col items-center px-4 py-2 rounded-lg border border-dashed cursor-pointer hover:bg-gray-50 transition-colors" style={{ borderColor: COLORS.border }}>
-                    <svg className="h-8 w-8 mb-1" style={{ color: COLORS.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <label className="flex flex-col items-center px-4 py-2 rounded-lg border border-dashed cursor-pointer hover:bg-gray-50 transition-colors border-gray-300">
+                    <svg className="h-8 w-8 mb-1 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span className="text-xs text-center" style={{ color: COLORS.gray }}>
+                    <span className="text-xs text-center text-gray-500">
                       {watch('profilePicture')  // solve the issue
 
                         ? watch('profilePicture')?.[0]?.name 
@@ -265,7 +253,7 @@ export default function SignupPage() {
                   </label>
                 </div>
                 {errors.profilePicture && (
-                  <p className="mt-1 text-xs" style={{ color: COLORS.error }}>
+                  <p className="mt-1 text-xs text-red-600">
                     {errors.profilePicture.message}
                   </p>
                 )}
@@ -277,32 +265,26 @@ export default function SignupPage() {
             <input
               id="terms"
               type="checkbox"
-              className="h-4 w-4 rounded focus:ring-0"
-              style={{ borderColor: COLORS.border, color: COLORS.primary }}
+              className="h-4 w-4 rounded focus:ring-0 focus:ring-offset-0 checked:bg-[#6C48E3] checked:border-[#6C48E3] dark:checked:bg-[#6C48E3] dark:checked:border-[#6C48E3]"
               required
             />
-            <label htmlFor="terms" className="ml-2 block text-sm" style={{ color: COLORS.gray }}>
-              I agree to the <a href="#" className="font-medium" style={{ color: COLORS.primary }}>Terms of Service</a> and <a href="#" className="font-medium" style={{ color: COLORS.primary }}>Privacy Policy</a>
+            <label htmlFor="terms" className="ml-2 block text-sm text-gray-600 dark:text-[#F2F4F7]" >
+              I agree to the <a href="#" className="font-medium text-[#6C48E3]">Terms of Service</a> and <a href="#" className="font-medium text-[#6C48E3]">Privacy Policy</a>
             </label>
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: Object.keys(errors).length > 0 ? `${COLORS.primary}80` : COLORS.primary,
-              color: COLORS.textLight,
-              borderColor: COLORS.primary,
-            }}
-            disabled={Object.keys(errors).length > 0}
+            className={`w-full py-3 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-[#6C48E3] hover:text-white bg-white border border-[#6C48E3] dark:bg-[#F2F4F7] dark:hover:bg-[#6C48E3] dark:text-[#6C48E3] dark:hover:text-[#F2F4F7] text-gray-600`}
+            
           >
             Create Account
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm" style={{ color: COLORS.gray }}>
+        <div className="mt-6 text-center text-sm text-gray-600 dark:text-[#F2F4F7]">
           Already have an account?{' '}
-          <Link href="/auth/login" className="font-medium" style={{ color: COLORS.primary }}>
+          <Link href="/auth/login" className="font-medium text-[#6C48E3]" >
             Sign in
           </Link>
         </div>
@@ -310,7 +292,7 @@ export default function SignupPage() {
     </div>
   ) : (
     <div className="w-full min-h-screen flex items-center justify-center">
-      <div className="animate-spin" style={{ color: COLORS.primary }}>
+      <div className="animate-spin ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12">
         <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>

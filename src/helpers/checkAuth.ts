@@ -6,23 +6,24 @@ import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
 import connectDB from "@/db/index";
 import User from "@/models/users.models";
+import { ApiError } from "@/utils/ApiError";
 connectDB();
 
 export default async function getDataFromToken(request: NextRequest) {
     const accessToken = request.cookies.get("accessToken")?.value || "";
     if (!accessToken) {
-        return null;
+        throw new ApiError(401, "User Session expired or not logged in");
     }
     
     try {
         const decodedToken:any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET!);
         const user = await User.findById(decodedToken.id).select("-password -__v");
                 if (!user) {
-                    throw new Error("User not found");
+                    throw new ApiError(404, "User not found");
                 }
 
                 if(user.sessionId!=decodedToken.sessionId){
-                    throw new Error("Session not found");
+                    throw new ApiError(401, "Session not found");
                 }
 
                 if (user) {

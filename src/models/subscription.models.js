@@ -6,14 +6,9 @@ const subscriptionSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    classroom: {
+    classroom: {//it will be assigned by admin later after verification
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Classroom',
-        required: true,
-    },
-    amount: {
-        type: Number,
-        required: true,
     },
     payment: {
         type: mongoose.Schema.Types.ObjectId,
@@ -22,13 +17,15 @@ const subscriptionSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'success', 'failed'],
+        enum: ['pending', 'subscribed', 'failed'],
         default: 'pending',
         required: true,
     },
-    paymentGateway: {
-        type: String
-    },
+    course:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Course",
+        required:true
+    }
    
 }, {
     timestamps: true
