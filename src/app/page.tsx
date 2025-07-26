@@ -77,7 +77,7 @@ export default function LandingPage() {
           welcome to <span className="text-[#6C48E3] font-mono font-bold">Handwriting Training Center</span>
         </h1>
         <p className="mt-4 text-lg max-w-xl">
-          Find the perfect tutor for you or your child's writing needs.
+          Find the perfect tutor for you or your children&apos;s handwriting needs.
         </p>
         <div className="mt-6 flex gap-4">
 
