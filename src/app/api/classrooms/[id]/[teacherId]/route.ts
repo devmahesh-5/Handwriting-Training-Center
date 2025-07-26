@@ -10,7 +10,7 @@ import { isValidObjectId } from "mongoose";
 connectDB();
 
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string, teacherId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string; teacherId: string } }) {
     try {
 
         const { id, teacherId } = params;
