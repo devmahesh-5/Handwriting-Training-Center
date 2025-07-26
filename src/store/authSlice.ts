@@ -9,11 +9,11 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        login: (state: any, action:any) => {
+        login: (state: { status: boolean; userData: any; }, action: { payload: unknown }) => {
             state.status = true;
             state.userData = action.payload;
         },
-        logout: (state: any) => {
+        logout: (state: { status: boolean; userData: any; }) => {
             state.status = false;
             state.userData = null;
         },

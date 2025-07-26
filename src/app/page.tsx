@@ -12,8 +12,8 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const dispatch = useDispatch();
-  const authStatus = useSelector((state: any) => state.auth.status);
-  const userData = useSelector((state:any)=>state.auth.userData);
+  const authStatus = useSelector((state: { auth: { status: boolean; userData: userData; }}) => state.auth.status);
+  const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; })=>state.auth.userData);
 
   useEffect(()=>{
     const fetchUser = async () => {

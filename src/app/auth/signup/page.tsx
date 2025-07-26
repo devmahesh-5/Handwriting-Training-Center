@@ -3,7 +3,7 @@ import Logo from '@/components/LOGO';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { generateUsername } from 'unique-username-generator';
@@ -57,10 +57,10 @@ export default function SignupPage() {
         router.push('/auth/login');
       }
       toast.success("Account created successfully!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Signup error:", error);
-      setError(error?.response?.data?.message || "Signup failed. Please try again.");
-      toast.error(error?.response?.data?.message || "Signup failed");
+      setError(error instanceof AxiosError ? error.response?.data?.message : "Signup failed");
+      toast.error(error instanceof AxiosError ? error.response?.data?.message : "Signup failed");
     } finally {
       setLoading(false);
     }

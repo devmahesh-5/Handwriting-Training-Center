@@ -167,7 +167,7 @@ export async function GET(req: NextRequest) {
             }
         );
         
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Error getting user:", error);
         return NextResponse.json(
             {

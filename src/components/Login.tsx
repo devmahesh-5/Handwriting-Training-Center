@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { FaSpinner } from 'react-icons/fa';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import Input from '@/components/Input';
@@ -37,10 +37,10 @@ export default function LoginPage() {
         router.push('/');
       }
       toast.success("User SignIn successful");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("error occurred", error);
-      setError(error?.response?.data?.message || "Login failed");
-      toast.error(error?.response?.data?.message || "Login failed");
+      setError( error instanceof AxiosError ? error.response?.data?.message : "Login failed");
+      toast.error(error instanceof AxiosError ? error.response?.data?.message : "Login failed");
     } finally {
       setLoading(false);
     }
@@ -198,7 +198,7 @@ return !loading ? (
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-2] bg-white text-gray-500 dark:text-[#F2F4F7] dark:bg-gray-800">
-              Don't have an account?
+              Don&apos;t have an account?
             </span>
           </div>
         </div>

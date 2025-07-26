@@ -1,3 +1,4 @@
+import { ApiError } from "@/utils/ApiError";
 import {v2 as cloudinary} from "cloudinary";
 import fs from "fs";
 
@@ -7,7 +8,7 @@ import fs from "fs";
         api_secret: process.env.CLOUDINARY_API_SECRET! // Click 'View API Keys' above to copy your API secret
     });
 
-     const uploadOnCloudinary = async (localFilePath:any) => {
+     const uploadOnCloudinary = async (localFilePath: string) => {
         if (!localFilePath) return null;
         try {
             // Upload to Cloudinary
@@ -16,8 +17,8 @@ import fs from "fs";
             });
     
             return uploadResult;
-        } catch (error:any) {
-            throw new Error(error.message);
+        } catch (error:unknown) {
+            throw new ApiError(500, "Error uploading file to Cloudinary");
         } finally {
                 fs.unlinkSync(localFilePath);
         }

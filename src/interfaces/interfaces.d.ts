@@ -7,15 +7,15 @@ interface User {
     isVerified: boolean,
     refreshToken: string,
     forgetPasswordToken: string,
-    forgetPasswordTokenExpiry: Number,
+    forgetPasswordTokenExpiry: number,
     createdAt: date,
     updatedAt: date,
-    __v: Number,
+    __v: number,
     otp: string,
-    otpExpiry: Number,
-    sessionId:Number,
-    unVerified_at: Number
-    verificationAttempts: Number
+    otpExpiry: number,
+    sessionId:number,
+    unVerified_at: number
+    verificationAttempts: number
     password: string,
     address: string,
     phone: string,
@@ -36,7 +36,7 @@ interface Classroom {
     status: string,
     createdAt: date,
     updatedAt: date,
-    __v: Number
+    __v: number
 }
 
 interface Course {
@@ -44,26 +44,37 @@ interface Course {
     name: string,
     description: string,
     type: string,
-    price: Number,
-    duration: Number,
+    price: number,
+    duration: number,
     thumbnail: string,
     practiceSet: string[],
     createdAt: date,
     updatedAt: date,
-    __v: Number
+    __v: number
 }
 
 interface Payment {
     _id: string,
     student: string,
     Classroom: string,
-    amount: Number,
+    amount: number,
     status: string,
     paymentGateway: string,
     transaction_uuid: string,
     subscription: string,
     createdAt: date,
     updatedAt: date,
-    __v: Number
+    __v: number
 }
-
+interface userData {
+    _id: string,
+    fullName: string,
+    email: string,
+    username: string,
+    phone: string,
+    gender: string,
+    role: string,
+    isVerified: boolean,
+    profilePicture: string | null,
+    
+}
