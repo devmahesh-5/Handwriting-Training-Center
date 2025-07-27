@@ -7,9 +7,10 @@ import { ApiError } from "@/utils/ApiError";
 
 connectDB();
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const id = params.id;
+        const id = (await params).id;
+
         const user = await getDataFromToken(req);
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");
@@ -47,8 +48,9 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     }
 };
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const id = (await params).id;
         const user = await getDataFromToken(req);
         if (!user) {
             throw new Error("User Session expired or not logged in");
@@ -57,7 +59,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             throw new Error("User is not verified");
         }
 
-        if (!isValidObjectId(params.id)) {
+        if (!isValidObjectId(id)) {
             throw new ApiError(404, "Invalid course ID");
         }
 
@@ -65,7 +67,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             [
                 {
                     $match: {
-                        _id: params.id
+                        _id: id
                     }
                 },
 
@@ -133,7 +135,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const user = await getDataFromToken(req);
         if (!user) {
@@ -144,7 +146,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             throw new ApiError(401, "User is not verified");
         }
 
-        const id = params.id;
+        const id =(await params).id;
         const body = await req.json();
         const { name, description, type, price, duration } = body;
         [name, description, type, price, duration].some(field => !field || field === undefined) && NextResponse.json({ message: "All fields are required" }, { status: 400 });

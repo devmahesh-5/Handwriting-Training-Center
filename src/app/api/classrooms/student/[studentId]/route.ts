@@ -7,9 +7,11 @@ import { isValidObjectId } from "mongoose";
 import { ApiError } from "@/utils/ApiError";
 connectDB();
 
-export async function GET(req: NextRequest, { params }: { params: { studentId: string }}) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ studentId: string }> }) {
     try {
         const user = await getDataFromToken(req);
+
+        const { studentId } = await params
 
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");
@@ -19,7 +21,7 @@ export async function GET(req: NextRequest, { params }: { params: { studentId: s
             throw new ApiError(401, "User is not verified");
         }
 
-        if(!isValidObjectId(params.studentId) && (user._id!==params.studentId || user.role!=="student")){ 
+        if(!isValidObjectId(studentId) && (user._id!==studentId || user.role!=="student")){ 
             throw new ApiError(401, "User is not authorized to view this classroom");
         }
 
@@ -27,7 +29,7 @@ export async function GET(req: NextRequest, { params }: { params: { studentId: s
             [
                 {
                     $match: {
-                        student: params.studentId
+                        students: studentId
                     }
                 },
                 {
