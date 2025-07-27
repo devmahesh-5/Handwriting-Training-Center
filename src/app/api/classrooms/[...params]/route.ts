@@ -9,18 +9,12 @@ import { isValidObjectId } from "mongoose";
 
 connectDB();
 
-interface Context {
-  params: {
-    id: string;
-    teacherId: string;
-  };
-}
 
 
-export async function PATCH(req: NextRequest, context: Context) {
+export async function PATCH(req: NextRequest, { params }: { params: { params: string[] } }) {
     try {
 
-        const { id, teacherId } = context.params;
+        const [id, teacherId] = params.params;
         const user = await getDataFromToken(req);
 
         if (!user) {

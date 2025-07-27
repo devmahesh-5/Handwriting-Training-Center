@@ -10,9 +10,9 @@ import { ApiError } from "@/utils/ApiError";
 
 connectDB();
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string, studentId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: { params: string[] } }) {
     try {
-        const { id, studentId } = params;
+        const [id, studentId] = params.params;
         const user = await getDataFromToken(req);
 
         if (!user) {
