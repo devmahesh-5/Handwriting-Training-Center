@@ -10,10 +10,17 @@ import { ApiError } from "@/utils/ApiError";
 
 connectDB();
 
-export async function PATCH(req: NextRequest, { params }: { params: { params: string[] } }) {
+export async function PATCH(req: NextRequest) {
     try {
-        const [id, studentId] = params.params;
+        const {searchParams} = new URL(req.url);
+        const id = searchParams.get("id");
+        const studentId = searchParams.get("studentId");
+
         const user = await getDataFromToken(req);
+
+        if(!isValidObjectId(id) || !isValidObjectId(studentId)){
+            throw new ApiError(400, "Invalid classroom id or student id");
+        }
 
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");
@@ -21,10 +28,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { params: st
 
         if (user.isVerified === false) {
             throw new ApiError(401, "User is not verified");
-        }
-
-        if (!isValidObjectId(id) || !isValidObjectId(studentId)) {
-            throw new ApiError(400, "Invalid classroom id or student id");
         }
 
         if (user.role !== "admin") {

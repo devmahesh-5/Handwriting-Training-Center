@@ -11,11 +11,22 @@ connectDB();
 
 
 
-export async function PATCH(req: NextRequest, { params }: { params: { params: string[] } }) {
-    try {
+export async function PATCH(req: NextRequest) {
 
-        const [id, teacherId] = params.params;
+    try {
         const user = await getDataFromToken(req);
+
+        //i want to assign a teacher to a classroom and get id and teacher id from query
+
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get("id");
+        const teacherId = searchParams.get("teacherId");
+
+        if(!isValidObjectId(id) || !isValidObjectId(teacherId)){
+            throw new ApiError(400, "Invalid classroom id or teacher id");
+        }
+
+        
 
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");
@@ -23,10 +34,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { params: st
 
         if (user.isVerified === false) {
             throw new ApiError(401, "User is not verified");
-        }
-
-        if (!isValidObjectId(id) || !isValidObjectId(teacherId)) {
-            throw new ApiError(400, "Invalid classroom id or teacher id");
         }
 
         if (user.role !== "admin") {
