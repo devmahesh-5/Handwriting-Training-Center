@@ -8,11 +8,11 @@ import { isValidObjectId } from "mongoose";
 import { ApiError } from "@/utils/ApiError";
 connectDB();
 
-export async function POST(req: NextRequest, { params }: { params: { userId: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
     try {
         const body = await req.json();
         const user = await getDataFromToken(req);
-        const userId = params.userId;
+        const {userId} = await params;
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");
         }
@@ -46,5 +46,6 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
                 status: error instanceof ApiError ? error.statusCode : 500
             });
     }
+
 }
 

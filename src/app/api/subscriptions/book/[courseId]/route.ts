@@ -9,9 +9,9 @@ import Subscription from '@/models/subscription.models';
 connectDB();
 
 
-export const POST = async(req:NextRequest,{params}:{params:{courseId:string}})=>{
+export const POST = async(req:NextRequest,{params}:{params: Promise<{courseId:string}> })=>{
     try {
-        const {courseId} = params;
+        const {courseId} = await params;
         
         if(!isValidObjectId(courseId)){
             throw new ApiError(400,"Invalid course id")

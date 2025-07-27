@@ -12,9 +12,9 @@ import { ApiError } from "@/utils/ApiError";
 
 connectDB();
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const { id } = params;
+        const { id } = await params;
         const user = await getDataFromToken(request);
         if (!user) {
 
@@ -45,8 +45,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
-    const { id } = params;
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     try {
 
         const user = await getDataFromToken(request);

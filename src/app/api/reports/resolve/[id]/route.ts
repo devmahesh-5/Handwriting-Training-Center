@@ -6,9 +6,9 @@ import { isValidObjectId } from "mongoose";
 import { ApiError } from "@/utils/ApiError";
 connectDB();
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const id = params.id;
+        const {id} = await params;
         const user = await getDataFromToken(req);
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");

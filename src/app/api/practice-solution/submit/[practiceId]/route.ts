@@ -12,9 +12,9 @@ import User from "@/models/users.models";
 connectDB();
 
 
-export async function POST(request: NextRequest, { params }: { params: { practiceId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ practiceId: string }> }) {
     try {
-        const { practiceId } = params;
+        const { practiceId } = await params;
 
         if (!isValidObjectId(practiceId)) {
             throw new ApiError(404, "invalid practice id");

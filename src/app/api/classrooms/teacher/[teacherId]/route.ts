@@ -6,7 +6,7 @@ import { isValidObjectId } from "mongoose";
 import { ApiError } from "@/utils/ApiError";
 connectDB();
 
-export async function GET(req: NextRequest, { params }: { params: { teacherId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ teacherId: string }> }) {
     try {
         const user = await getDataFromToken(req);
         
@@ -18,14 +18,16 @@ export async function GET(req: NextRequest, { params }: { params: { teacherId: s
             throw new ApiError(401, "User is not verified");
         }
 
-        if (!isValidObjectId(params.teacherId) && (user._id !== params.teacherId || user.role == "admin")) {
+        const { teacherId } = await params
+
+        if (!isValidObjectId(teacherId) && (user._id !== teacherId || user.role == "admin")) {
             throw new ApiError(401, "User is not authorized to view this classroom");
         }
 
         const classroom = await Classroom.aggregate([
             {
                 $match: {
-                    teacher: params.teacherId
+                    teacher: teacherId
                 }
             },
             {

@@ -8,11 +8,11 @@ import { ApiError } from "@/utils/ApiError";
 
 connectDB();
 
-export async function POST(req: NextRequest, { params }: { params: { id: string, practiceEntryId: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string, practiceEntryId: string }> }) {
     try {
 
         const { _id: userId } = await getDataFromToken(req);
-        const { id, practiceEntryId } = params;
+        const { id, practiceEntryId } = await params;
         if (!isValidObjectId(userId)) {
             throw new ApiError(404, "user not Authenticated")
         }
@@ -55,10 +55,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string,
     }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string, practiceEntryId: string } }){
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string, practiceEntryId: string }> }){
     try {
         const { _id: userId } = await getDataFromToken(req);
-        const { id, practiceEntryId } = params;
+        const { id, practiceEntryId } = await params;
         if (!isValidObjectId(userId)) {
             throw new ApiError(404, "user not Authenticated")
         }

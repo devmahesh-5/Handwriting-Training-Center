@@ -7,9 +7,9 @@ import { ApiError } from "@/utils/ApiError";
 
 connectDB();
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const { id } = params;
+        const { id } = await params;
         if (!isValidObjectId(id)) {
             throw new ApiError(404, "invalid practice set id");
         }

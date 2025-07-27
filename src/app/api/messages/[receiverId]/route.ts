@@ -10,7 +10,7 @@ import { ApiError } from "@/utils/ApiError";
 connectDB();
 
 
-export async function POST(req: NextRequest, { params }: { params: { receiverId: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ receiverId: string }> }) {
 
     try {
         const user = await getDataFromToken(req);
@@ -20,6 +20,8 @@ export async function POST(req: NextRequest, { params }: { params: { receiverId:
         if (user.isVerified === false) {
             throw new ApiError(401, "User is not verified");
         }
+
+        const receiverId = (await params).receiverId;
 
         const formData = await req.formData();
         const message = formData.get('message') as string;
@@ -42,7 +44,7 @@ export async function POST(req: NextRequest, { params }: { params: { receiverId:
         const newMessage = await Messages.create(
             {
                 sender: user?._id,
-                receiver: params?.receiverId,
+                receiver: receiverId,
                 message,
                 messageFile: uploadedmessageFile?.secure_url
             });
@@ -65,7 +67,7 @@ export async function POST(req: NextRequest, { params }: { params: { receiverId:
     }
 }
 
-export async function GET(req: NextRequest, { params }: { params: { receiverId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ receiverId: string }> }) {
     try {
         const user = await getDataFromToken(req);//it is the middleware to check if the user is logged in
         if (!user) {
@@ -75,7 +77,7 @@ export async function GET(req: NextRequest, { params }: { params: { receiverId: 
             throw new ApiError(401, "User is not verified");
         }
         const sender = user?._id;
-        const receiver = params?.receiverId;
+        const receiver = (await params).receiverId;
         const { searchParams } = new URL(req.url);
         const limit = searchParams.get('limit') || 10;
 

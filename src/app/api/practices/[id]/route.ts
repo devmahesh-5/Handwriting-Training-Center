@@ -8,9 +8,10 @@ import { ApiError } from "@/utils/ApiError";
 
 connectDB();
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const practice = await Practice.findById(params.id);
+        const {id} = await params;
+        const practice = await Practice.findById(id);
         if (!practice) {
             throw new ApiError(404, "Practice not found");
         }
@@ -33,9 +34,15 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const practice = await Practice.findByIdAndDelete(params.id);
+        const user = await getDataFromToken(req);
+
+        if (!user) {
+            throw new ApiError(401, "User Session expired or not logged in");
+        }
+        const {id} = await params;
+        const practice = await Practice.findByIdAndDelete(id);
         if (!practice) {
             throw new ApiError(404, "Practice not found");
         }
@@ -58,12 +65,22 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 }
 
 //needs to review
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const body = await req.json();
+        const user = await getDataFromToken(req);
+
+        if (!user) {
+            throw new ApiError(401, "User Session expired or not logged in");
+        }
         
+        const {id} = await params;
+
+        if(user.isVerified === false || user.role !== "admin") {
+            throw new ApiError(401, "User is authorized to update practice");
+        }
         const practice = await Practice.findByIdAndUpdate(
-            params.id,
+            id,
             body, { new: true });
         if (!practice) {
             throw new ApiError(404, "Practice not found");

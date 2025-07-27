@@ -8,7 +8,7 @@ import User from "@/models/users.models";
 
 connectDB();
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { _id: userId } = await getDataFromToken(request);
 
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         if (user.isVerified === false) {
             throw new ApiError(400, "User is not verified");
         }
-        const { id } = params;
+        const { id } = await params;
 
         if (!isValidObjectId(id)) {
             throw new ApiError(404, "invalid practice solution id");
