@@ -89,10 +89,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         //for teacher marking
-        const { id } = params;
+        const { id } = await params;
         const { status, feedback, marks } = await request.json();
         // const studentId = request.nextUrl.searchParams.get("studentId");
         const { _id: userId } = await getDataFromToken(request);
