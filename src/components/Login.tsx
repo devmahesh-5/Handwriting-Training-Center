@@ -34,7 +34,7 @@ export default function LoginPage() {
       const userSession = await axios.post('/api/users/login', data);
       if (userSession.status==200) {
         setLoading(false);
-        router.push('/');
+        router.push('/home');
       }
       toast.success("User SignIn successful");
     } catch (error: unknown) {

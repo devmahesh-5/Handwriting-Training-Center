@@ -115,7 +115,7 @@ export default function SignupPage() {
               <Input
                 type="email"
                 label="Email Address"
-                placeholder="john@example.com"
+                placeholder="harke@example.com"
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
@@ -124,12 +124,14 @@ export default function SignupPage() {
                   }
                 })}
                 error={errors.email?.message}
+                className='rounded-lg'
               />
 
               <Input
                 type="text"
                 label="Username"
-                placeholder="john_doe"
+                placeholder="random_username"
+                className='rounded-lg'
                 {...register("username", {
                   required: "Username is required",
                   minLength: {
@@ -153,7 +155,7 @@ export default function SignupPage() {
                   type={passwordType}
                   label="Password"
                   placeholder="••••••••"
-                  className="pr-10"
+                  className="pr-10 rounded-lg"
                   {...register("password", {
                     required: "Password is required",
                     validate: (value) => {
@@ -203,6 +205,7 @@ export default function SignupPage() {
                 inputMode="numeric"
                 label="Phone Number"
                 placeholder="9800000000"
+                className="w-full rounded-lg"
                 {...register("phone", {
                   required: "Phone number is required",
                   pattern: {

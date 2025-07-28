@@ -8,6 +8,7 @@ import {login, logout} from '@/store/authSlice';
 import Link from 'next/link'
 import Logo from "@/components/LOGO";
 
+
 export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
@@ -35,17 +36,15 @@ export default function LandingPage() {
 
   },[dispatch]);
 
-  const handleLogout = async() => {
+
+    const handleLogout = async() => {
     try {
       const response = await axios.post('/api/users/logout');
-      setUser(null);
       dispatch(logout());
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
-
-
 
 
   return (
@@ -78,6 +77,7 @@ export default function LandingPage() {
            )}
         </nav>
       </header>
+      
       <section className="flex flex-col items-center justify-center text-center py-24 px-4">
 
             
@@ -133,3 +133,4 @@ export default function LandingPage() {
     </main>
   )
 }
+
