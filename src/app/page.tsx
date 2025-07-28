@@ -14,11 +14,10 @@ export default function LandingPage() {
   const dispatch = useDispatch();
   const authStatus = useSelector((state: { auth: { status: boolean; userData: userData; }}) => state.auth.status);
   const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; })=>state.auth.userData);
-
   useEffect(()=>{
     const fetchUser = async () => {
       try {
-        setLoading(true);
+        
         const user = await axios.get('/api/users/me');
         setUser(user.data.user);
         dispatch(login(user.data.user));
@@ -36,40 +35,49 @@ export default function LandingPage() {
 
   },[dispatch]);
 
+  const handleLogout = async() => {
+    try {
+      const response = await axios.post('/api/users/logout');
+      setUser(null);
+      dispatch(logout());
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
 
 
-  return !loading?(
+
+  return (
     <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
       {/* Hero Section */}
-      {authStatus &&(<header className="bg-white dark:bg-gray-900">
+      <header className="bg-white dark:bg-gray-900">
         <nav className="max-w-5xl mx-auto flex  items-center justify-between p-4">
           
           <div className="flex items-center">
             <Logo />
           </div>
-
-          <div className="">
-              <p className="text-3xl text-[#F2F4F7] dark:text-gray-200 font-mono font-bold"> Namaskar <span className="text-[#6C48E3] font-mono font-bold">{userData?.fullName}</span> </p>
-              </div>
-
-          <div className="flex items-center cursor-pointer">
-            {userData?.profilePicture && userData?.profilePicture !== '' && userData?.profilePicture !== 'undefined' ? (
-            <img
-              src={userData.profilePicture}
-              alt="Profile"
-              className="w-14 h-14 rounded-full object-cover cursor-pointer"
-            />
-          ) : (<svg
-                    className="w-14 h-14 rounded-full object-cover text-gray-200 bg-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>)}
+{authStatus ?(
+          <div className="flex items-center gap-4">
+            <button 
+            className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800"
+            onClick={() => handleLogout()}
+            >
+              Log Out
+            </button>
           </div>
+           ):(
+            <div className="flex items-center gap-4">
+            <Link href="/auth/login" className="px-6 py-3 border border-blue-600 rounded-xl bg-white hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800 dark:text-[#082845]">
+              Log In
+            </Link>
+            <Link href="/auth/signup" className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800">
+              Sign Up
+            </Link>
+          </div>
+           )}
         </nav>
-      </header>)}
+      </header>
       <section className="flex flex-col items-center justify-center text-center py-24 px-4">
 
             
@@ -82,10 +90,10 @@ export default function LandingPage() {
         <div className="mt-6 flex gap-4">
 
           {
-            !authStatus ?(<Link href="/auth/signup" className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-blue-500 hover:text-white dark:hover:bg-gray-800">
+            !authStatus ?(<Link href="/auth/signup" className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800">
             Join now
           </Link>):(
-            <Link href="/users/me" className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-blue-500 hover:text-white dark:hover:bg-gray-800">
+            <Link href="/users/me" className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800">
             Dashboard
           </Link>
           )}
@@ -123,9 +131,5 @@ export default function LandingPage() {
         </div>
       </section>
     </main>
-  ):(
-    <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-        <h1>loading...</h1>
-      </main>
   )
 }

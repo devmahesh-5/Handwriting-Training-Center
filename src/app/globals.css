@@ -2,3 +2,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 3, 0, 20;
+    --color-secondary: 21, 19, 18;
+    --color-accent: 171, 139, 255;
+    /* Add other colors if needed */
+  }
+}
