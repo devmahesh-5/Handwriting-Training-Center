@@ -15,7 +15,15 @@ function DashboardPage() {
     return (
         <main className="min-h-screen dark:bg-gray-900 bg-[#F2F4F7]">
             <Header />
-            
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-gray-300'>
+                <div >hey</div>
+                <div>hey1</div>
+                <div>hey1</div>
+                <div>hey1</div>
+                <div>hey1</div>
+                <div>hey1</div>
+
+            </div>
 
         </main>
     )

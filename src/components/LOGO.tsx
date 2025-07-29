@@ -5,7 +5,7 @@ import Image from 'next/image';
 function Logo({ msg }: { msg?: string }) {
     return (
         <Link href="/" className="cursor-pointer flex flex-row items-center">
-            <Image src="/logo_icon.png" alt="Handwriting Logo" width={48} height={48} objectFit='contain' max-blend-mod='color-burn'/>
+            <Image src="/logo_icon.png" alt="Handwriting Logo" width={48} height={48} objectFit='contain' className='rounded-full'/>
             {msg && <h1 className="text-xs text-gray-600">{msg}</h1>}
         </Link>
     );
