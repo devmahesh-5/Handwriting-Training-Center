@@ -11,6 +11,19 @@ const practiceSchema = new mongoose.Schema({
     image: {
         type: String
     },
+    difficulty: {
+        type: String,
+        enum: ['Beginner', 'Intermediate', 'Advanced'],
+        required: true,
+    },
+    tags: {
+        type: [String],
+        required: true,
+    },
+    xpReward: {
+        type: Number,
+        required: true,
+    },
     video:{
         type:String
     }
