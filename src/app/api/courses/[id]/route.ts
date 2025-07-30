@@ -1,9 +1,10 @@
 import Courses from "@/models/course.models";
 import connectDB from "@/db/index";
 import { NextResponse, NextRequest } from "next/server";
-import { isValidObjectId } from "mongoose";
 import getDataFromToken from "@/helpers/checkAuth";
 import { ApiError } from "@/utils/ApiError";
+import User from "@/models/users.models";
+import mongoose,{isValidObjectId} from "mongoose";
 
 connectDB();
 
@@ -51,6 +52,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const id = (await params).id;
+        console.log(id);
         const user = await getDataFromToken(req);
         if (!user) {
             throw new Error("User Session expired or not logged in");
@@ -63,11 +65,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             throw new ApiError(404, "Invalid course ID");
         }
 
-        const course = Courses.aggregate(
+        const course = await Courses.aggregate(
             [
                 {
                     $match: {
-                        _id: id
+                        _id: new mongoose.Types.ObjectId(id)
                     }
                 },
 

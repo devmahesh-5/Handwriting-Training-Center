@@ -19,7 +19,7 @@ const courseSchema = new mongoose.Schema({
         required: true,
     },
     duration: {
-        type: Number,
+        type: String,
         required: true,
     },
     thumbnail: {
@@ -29,7 +29,6 @@ const courseSchema = new mongoose.Schema({
     practiceSet: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'PracticeSet',
-        required: true
     }
 
 }, { timestamps: true });
