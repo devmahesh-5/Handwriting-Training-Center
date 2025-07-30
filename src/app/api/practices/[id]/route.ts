@@ -81,7 +81,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         }
         const practice = await Practice.findByIdAndUpdate(
             id,
-            body, { new: true });
+            { $set:
+                {
+                    ...body
+                }
+            }, 
+            { new: true });
         if (!practice) {
             throw new ApiError(404, "Practice not found");
         }

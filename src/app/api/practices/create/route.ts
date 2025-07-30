@@ -15,13 +15,22 @@ export async function POST(request: NextRequest) {
     const instruction = formData.get("instruction") as string;
     const image = formData.get("image") as File;
     const video = formData.get("video") as File;
-    const teacher = await getDataFromToken(request);
+    const user = await getDataFromToken(request);
+    const xp = formData.get("xp") as string;
+    const tags = formData.get("tags") as string;
+    const difficulty = formData.get("difficulty") as string;
 
-    if (!teacher) {
+    [title, instruction, xp, tags, difficulty].forEach((field) => {
+        if (!field) {
+            throw new ApiError(400, "All fields are required");
+        }
+    });
+
+    if (!user) {
        throw new ApiError(404,"user not Found");
     }
 
-    if (teacher.isVerified === false || teacher.role !== "teacher") {
+    if (user.isVerified === false || user.role !== "admin") {
         throw new ApiError(400,"user not verified")
     }
 
@@ -32,6 +41,7 @@ export async function POST(request: NextRequest) {
 
         const tempFilePath = await saveBuffer(image);
         uploadedImage = await uploadOnCloudinary(tempFilePath);
+
         if (!uploadedImage) {
             return NextResponse.json({ message: "Error uploading image" }, { status: 500 });
         }
@@ -41,6 +51,7 @@ export async function POST(request: NextRequest) {
     if (video instanceof File && video.size > 0) {
 
         const tempFilePath = await saveBuffer(video);
+
         uploadedVideo = await uploadOnCloudinary(tempFilePath);
         if (!uploadedVideo) {
             throw new ApiError(500, "Error uploading video");
@@ -51,9 +62,14 @@ export async function POST(request: NextRequest) {
         const practice = await Practice.create({
             title,
             instruction,
-            image,
-            video
+            image:uploadedImage?.secure_url,
+            video:uploadedVideo?.secure_url,
+            xp,
+            tags,
+            difficulty
         });
+
+
         return NextResponse.
             json({
                 message: "Practice created successfully",

@@ -20,7 +20,7 @@ const practiceSchema = new mongoose.Schema({
         type: [String],
         required: true,
     },
-    xpReward: {
+    xp: {
         type: Number,
         required: true,
     },
