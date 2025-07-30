@@ -17,7 +17,11 @@ export async function POST(req: NextRequest) {
             teacher: user._id,
         });
         return NextResponse.json(classroom);
-    } catch (error: any) {
-        throw new ApiError(500, error.message);
+        
+    } catch (error: unknown) {
+        if (error instanceof ApiError) {
+            return NextResponse.json({ error: error.message }, { status: error.statusCode });
+        }
+        return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
     }
 }
