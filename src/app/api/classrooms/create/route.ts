@@ -16,6 +16,11 @@ export async function POST(req: NextRequest) {
             ...data,
             teacher: user._id,
         });
+        
+        if(!classroom){
+            throw new ApiError(500,"could not create classroom")
+        }
+        
         return NextResponse.json(classroom);
         
     } catch (error: unknown) {
