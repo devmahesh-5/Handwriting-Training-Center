@@ -3,11 +3,13 @@ const practiceEntrySchema = new mongoose.Schema(
   {
     practice: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Practice'
+      ref: 'Practice',
+      required: true
     },
     status: {
       type: String,
-      enum:["locked","active","completed"]
+      enum:["locked","active","completed"],
+      default:"locked"
     },
     day: {
       type: Number,
@@ -21,7 +23,7 @@ const practiceEntrySchema = new mongoose.Schema(
   {timestamps:true} 
 );
 
-const practiceEntry = mongoose.models.practiceEntry || mongoose.model("PracticeEntry",practiceEntrySchema)
+const practiceEntry = mongoose.models.PracticeEntry || mongoose.model("PracticeEntry",practiceEntrySchema)
 
 export default practiceEntry
 

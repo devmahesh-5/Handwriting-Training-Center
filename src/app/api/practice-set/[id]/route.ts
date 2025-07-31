@@ -9,14 +9,16 @@ connectDB();
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const { id } = await params;
+        const { id} = await params;
+
         if (!isValidObjectId(id)) {
             throw new ApiError(404, "invalid practice set id");
         }
+
         const practiceSet = await PracticeSet.aggregate([
             {
                 $match: {
-                    _id: id
+                    _id: new mongoose.Types.ObjectId(id)
                 }
             },
             {
@@ -93,3 +95,66 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 }
 
+// export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string, practiceEntryId: string }> }) {
+//     try {
+
+//         const { _id: userId,practiceEntryId } = await getDataFromToken(req);
+//         const { id } = await params;
+//         if (!isValidObjectId(userId)) {
+//             throw new ApiError(404, "user not Authenticated")
+//         }
+
+//         if(!isValidObjectId(practiceEntryId)){
+//             throw new ApiError(404,"practice entry not found")
+//         }
+
+//         const practiceSet = await PracticeSet.findByIdAndUpdate(
+//             id,
+//             {
+//                 $addToSet: {
+//                     practiceEntry: practiceEntryId
+//                 }
+//             },
+//             {
+//                 new: true
+//             }
+//         )
+
+//         if (!practiceSet) {
+//             throw new ApiError(404, "no practice set found");
+//         }
+
+//         return NextResponse
+//             .json({
+//                 message: "successfully updated practice set",
+//                 practiceSet
+//             },
+//                 {
+//                     status: 200
+//                 });
+        
+//     } catch (error: unknown) {
+//         if(error instanceof ApiError) {
+//             return NextResponse
+//             .json(
+//                 {
+//                     message: error.message,
+//                 },
+//                 {
+//                     status: error.statusCode
+//                 }
+//             )
+//         }else{
+
+//             return NextResponse
+//             .json(
+//                 {
+//                     message: "Something went wrong while updating practice set",
+//                 },
+//                 {
+//                     status: 500
+//                 }
+//             )
+//         }
+//     }
+// }
