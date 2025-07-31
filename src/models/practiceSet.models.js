@@ -6,19 +6,17 @@ const practiceSetSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        discription: {
+        description: {
             type: String,
             required: true
         },
         course:{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Course',
-            required: true
+            ref: 'Course'
         },
         practiceEntry:{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'PracticeEntry',
-            required: true
+            ref: 'PracticeEntry'
         }
         
     },

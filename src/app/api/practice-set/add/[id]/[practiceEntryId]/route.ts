@@ -17,20 +17,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             throw new ApiError(404, "user not Authenticated")
         }
 
-        const updatedPracticeSet = await PracticeSet.aggregate(
-            [
-                {
-                    $match: {
-                        _id: id
-                    }
-                },
-                {
-                    $addFields: {
-                        practiceEntry: practiceEntryId
-                    }
+        const updatedPracticeSet = await PracticeSet.findByIdAndUpdate(
+            id,
+            {
+                $addToSet: {
+                    practiceEntry: practiceEntryId
                 }
-            ]
+            }
         )
+
+        if (!updatedPracticeSet) {
+            throw new ApiError(404, "no practice set found");
+        }
 
         return NextResponse.json(
             {
@@ -58,7 +56,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string, practiceEntryId: string }> }){
     try {
         const { _id: userId } = await getDataFromToken(req);
+
         const { id, practiceEntryId } = await params;
+
         if (!isValidObjectId(userId)) {
             throw new ApiError(404, "user not Authenticated")
         }
