@@ -12,9 +12,9 @@ import User from "@/models/users.models";
 connectDB();
 
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ practiceId: string }> }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ classroomId: string, practiceId: string }> }) {
     try {
-        const { practiceId } = await params;
+        const { classroomId, practiceId } = await params;
 
         if (!isValidObjectId(practiceId)) {
             throw new ApiError(404, "invalid practice id");
@@ -50,6 +50,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
         const practiceSolution = await StudentSolution.create({
             student: user._id,
+            classroom: classroomId,
             practice: practiceId,
             submissionFile: uploadedSubmissionFile.secure_url
         });
