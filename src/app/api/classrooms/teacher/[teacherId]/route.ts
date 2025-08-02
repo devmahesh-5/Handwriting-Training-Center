@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/db/index";
 import Classroom from "@/models/classroom.models";
 import getDataFromToken from "@/helpers/checkAuth";
-import { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import { ApiError } from "@/utils/ApiError";
 connectDB();
 
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ teac
         const classroom = await Classroom.aggregate([
             {
                 $match: {
-                    teacher: teacherId
+                    teacher: new mongoose.Types.ObjectId(teacherId)
                 }
             },
             {

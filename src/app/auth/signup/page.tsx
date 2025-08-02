@@ -52,10 +52,9 @@ export default function SignupPage() {
     }
     try {
       const userSession = await axios.post('/api/users/register', formData);
-      if (userSession.status === 200) {
-        setLoading(false);
-        router.push('/auth/login');
-      }
+      
+      router.push('/auth/login');
+      
       toast.success("Account created successfully!");
     } catch (error: unknown) {
       console.error("Signup error:", error);
