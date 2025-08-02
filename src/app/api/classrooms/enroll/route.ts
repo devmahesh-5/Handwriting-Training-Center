@@ -39,6 +39,10 @@ export async function PATCH(req: NextRequest) {
             {
                 $addToSet: {
                     students: studentId
+                },
+                
+                $set:{
+                    status: "active" 
                 }
             },
             {

@@ -66,7 +66,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sub
             payment
         }, { status: 200 });
 
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof ApiError) {
+            return NextResponse.json({ message: error.message }, { status: error.statusCode });
+        }
+        return NextResponse.json({ message: "Failed to create payment" }, { status: 500 });
+
     }
 }

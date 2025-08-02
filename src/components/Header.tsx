@@ -79,12 +79,10 @@ export default function Header() {
                             <MdNotifications />
                         </button>
                     
-                        <Image
+                        <img
                             src={userData?.profilePicture || "/profile.png"}
                             alt="profile"
-                            width={32}
-                            height={32}
-                            className="rounded-full cursor-pointer"
+                            className="w-12 h-12 rounded-full object-cover border-2 border-blue-100 dark:border-gray-600 left-0 top-0"
                         />
                 </div>
 

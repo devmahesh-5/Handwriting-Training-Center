@@ -9,6 +9,10 @@ const classroomSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    practiceSet: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PracticeSet',
+    },
     teacher: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -21,18 +25,15 @@ const classroomSchema = new mongoose.Schema({
     ],
     course: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Course',
-        required: true
+        ref: 'Course'
     },
     payment: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Payment',
-        required: true,
+        ref: 'Payment'
     },
     subscription: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Subscription',
-        required: true,
     },
     status: {
         type: String,

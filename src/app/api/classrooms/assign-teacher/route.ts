@@ -5,7 +5,7 @@ import Classroom from "@/models/classroom.models";
 import getDataFromToken from "@/helpers/checkAuth";
 import { ApiError } from "@/utils/ApiError";
 import { isValidObjectId } from "mongoose";
-
+import User from "@/models/users.models";
 
 connectDB();
 
@@ -21,12 +21,16 @@ export async function PATCH(req: NextRequest) {
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");
         const teacherId = searchParams.get("teacherId");
+        
 
         if(!isValidObjectId(id) || !isValidObjectId(teacherId)){
             throw new ApiError(400, "Invalid classroom id or teacher id");
         }
 
-        
+        const teacher = await User.findById(teacherId);
+        if (!teacher || teacher.role !== "Teacher") {
+            throw new ApiError(404, "Teacher not found");
+        }
 
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");

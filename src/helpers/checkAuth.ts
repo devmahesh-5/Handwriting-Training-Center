@@ -10,12 +10,15 @@ import { ApiError } from "@/utils/ApiError";
 connectDB();
 
 export default async function getDataFromToken(request: NextRequest) {
-    const accessToken = request.cookies.get("accessToken")?.value || "";
+    
+
+    try {
+        const accessToken = request.cookies.get("accessToken")?.value || "";
+
     if (!accessToken) {
         throw new ApiError(401, "User Session expired or not logged in");
     }
 
-    try {
         const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET!) as JwtPayload & {
             id: string;
             sessionId: string;
@@ -35,7 +38,9 @@ export default async function getDataFromToken(request: NextRequest) {
             return user;
         }
     } catch (error: unknown) {
-        console.error("Invalid token:", error);
-        throw error;
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        throw new ApiError(500, "Something went wrong while checking authentication");
     }
 }
