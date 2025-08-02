@@ -224,7 +224,7 @@ export default function SignupPage() {
               />
 
               <Select
-                options={["Student", "Teacher", "Admin"]}
+                options={["Student", "Teacher"]}
                 label="Role"
                 className="w-full"
                 error={errors.role?.message}

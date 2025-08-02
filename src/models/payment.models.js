@@ -6,22 +6,20 @@ const paymentSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    Classroom: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Classroom',
-    },
-    amount: {
-        type: Number,
-        required: true,
-    },
-    status: {
+    paymentProof: {
         type: String,
         required: true,
     },
-     paymentGateway: {
-        type: String
+    amount: {
+        type: Number,
     },
-    transaction_uuid: {
+    status: {
+        type: String,
+        enum: ['pending', 'paid', 'failed'],
+        required: true,
+        default: 'pending',
+    },
+     paymentGateway: {
         type: String
     },
     subscription : {

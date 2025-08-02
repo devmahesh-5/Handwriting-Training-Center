@@ -71,5 +71,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sub
             return NextResponse.json({ message: error.message }, { status: error.statusCode });
         }
         return NextResponse.json({ message: "Failed to create payment" }, { status: 500 });
+
     }
 }
