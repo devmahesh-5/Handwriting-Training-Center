@@ -13,6 +13,8 @@ connectDB();
 export async function POST(req: NextRequest) {
     try {
         const {name, description} = await req.json();
+        const { searchParams } = new URL(req.url);
+        const courseId = searchParams.get("courseId");
 
         if (!name || !description) {
             throw new ApiError(400, "Name and description are required");
@@ -35,6 +37,7 @@ export async function POST(req: NextRequest) {
         const classroom = await Classroom.create({
             name,
             description,
+            course: courseId,
         });
         
         if(!classroom){

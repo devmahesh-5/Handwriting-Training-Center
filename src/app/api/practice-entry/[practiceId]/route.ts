@@ -4,14 +4,22 @@ import { NextResponse, NextRequest } from "next/server";
 import getDataFromToken from "@/helpers/checkAuth";
 import { ApiError } from "@/utils/ApiError";
 import PracticeEntry from "@/models/practiceEntry.models";
-import { log } from "console";
+import Practice from "@/models/practice.models";
 connectDB();
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ practiceId: string }> }) {
     try {
         
-        const {day, totalMarks} = await request.json();
+        const {day} = await request.json();
         const { practiceId } = await params;
+        const practice = await Practice.findById(practiceId);
+
+        if (!practice) {
+            throw new ApiError(404, "Practice not found");
+        }
+
+        const { totalMarks } = practice;
+        
 
         if (!day || !totalMarks || !practiceId) {
             throw new ApiError(400, "All fields are required");

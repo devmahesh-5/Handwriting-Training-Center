@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
             throw new ApiError(401, "User Session expired or not logged in");
         }
         
-        const user = await User.findById(userId).select("-password -sessionId -__v -refreshToken -createdAt -updatedAt -forgetPasswordToken -forgetPasswordExpiry -verifyToken -verifyTokenExpiry -unVerified_at -verificationAttempts");
+        const user = await User.findById(userId).select("-password -sessionId -__v -refreshToken -updatedAt -forgetPasswordToken -forgetPasswordExpiry -verifyToken -verifyTokenExpiry -unVerified_at -verificationAttempts");
 
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");

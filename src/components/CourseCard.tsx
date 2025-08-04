@@ -1,19 +1,26 @@
+'use client'
+import { useRouter } from 'next/navigation';
+import React from 'react';
 interface Props {
+    _id?: string;
     title: string;
     description: string;
     thumbnail: string;
-    xp?: number; // Optional XP indicator
-    duration?: string; // Optional duration
-    progress?: number; // Optional progress percentage (0-100)
+    xp?: number; 
+    duration?: string;
 }
 
 function CourseCard(props: Props) {
-    const { title, description, thumbnail, xp, duration, progress } = props;
-
+    const { title, description, thumbnail, xp, duration } = props;
+    const router = useRouter();
     return (
-        <div className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 dark:border-gray-700 cursor-pointer h-56">
+        <div className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-700 cursor-pointer h-56 hover:-translate-y-0.5 hover:shadow-lg ">
             {/* Thumbnail */}
+           
             <div className="relative h-24 w-full">
+                 <span className="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full z-10">
+                New Course
+                </span>
                 <img
                     src={thumbnail} 
                     alt={title}
@@ -37,8 +44,11 @@ function CourseCard(props: Props) {
                 </p>
                 </div>
 
-                <button className="mt-4 w-1/4 h-10 bg-[#6C48E3] hover:bg-[#5A3BC9] text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200">
-                    Learn
+                <button 
+                className="mt-4 h-10 bg-[#6C48E3] hover:bg-[#5A3BC9] text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6C48E3] focus:ring-offset-2 cursor-pointer" 
+                onClick={() => router.push(`/courses/${props._id}`)}
+                >
+                    Enroll Now
                 </button>
                 </div>
 

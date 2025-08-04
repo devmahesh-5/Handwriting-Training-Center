@@ -6,6 +6,7 @@ import Input from '@/components/Input';
 import { MdArrowDownward, MdArrowDropDownCircle, MdDetails, MdNotifications, MdOutlineArrowUpward } from 'react-icons/md';
 import Image from 'next/image';
 import Logo from '@/components/LOGO';
+import LogoutBtn from './logoutBtn';
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +24,7 @@ export default function Header() {
 
     return (
         <header className={`bg-[#F2F4F7] dark:bg-gray-900 dark:text-[#F2F4F7] sticky top-0 z-50`}>
-            <nav className='flex flex-row justify-between items-center mx-auto w-full px-4 py-3 sm:w-11/12 lg:w-4/5 md:py-4'>
+            <nav className='flex flex-row justify-between items-center mx-auto w-full px-4 py-3 sm:w-11/12 lg:w-10/12 md:py-4'>
                 {/* Logo */}
                 <div className='flex flex-row items-center'>
                     <Image
@@ -39,7 +40,7 @@ export default function Header() {
                 {/* Desktop Navigation */}
                 <div className='hidden md:flex flex-row bg-gray-300 dark:bg-gray-600 dark:text-[#F2F4F7] rounded-full'>
                     {navItems.map((item, index) => (
-                        <div key={index} className={`px-4 py-2 hover:bg-gray-400 dark:hover:bg-gray-400 rounded-full cursor-pointer ${item.active ? 'bg-gray-200 dark:bg-gray-700' : ''}`}>
+                        <div key={index} className={`px-4 py-2 hover:bg-gray-400 dark:hover:bg-gray-400 rounded-full cursor-pointer`}>
                             <Link href={item.slug}>{item.name}</Link>
                         </div>
                     ))}
@@ -84,6 +85,11 @@ export default function Header() {
                             alt="profile"
                             className="w-12 h-12 rounded-full object-cover border-2 border-blue-100 dark:border-gray-600 left-0 top-0"
                         />
+                        {
+                            authStatus && (
+                                <LogoutBtn />
+                            )
+                        }
                 </div>
 
                 {/* Mobile Menu Dropdown */}
