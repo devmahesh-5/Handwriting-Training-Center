@@ -14,24 +14,9 @@ connectDB();
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ classroomId: string, practiceId: string }> }) {
     try {
-        const { classroomId, practiceId } = await params;
+        const { _id } = await getDataFromToken(request);
 
-        if (!isValidObjectId(practiceId)) {
-            throw new ApiError(404, "invalid practice id");
-        }
-        const formData = await request.formData();
-
-        const submissionFile = formData.get("submissionFile") as File;
-
-        if (!submissionFile) {
-            throw new ApiError(400, "Submission file is required");
-        }
-
-
-
-        const { _id: userId } = await getDataFromToken(request);
-
-        const user = await User.findById(userId);
+        const user = await User.findById(_id);
 
         if (!user) {
             throw new ApiError(404, "User not found");
@@ -41,7 +26,32 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             throw new ApiError(400, "User is not verified");
         }
 
+        if(user.role !== "student") {
+            throw new ApiError(403, "Only students can submit practice solutions");
+        }
+
+        const { classroomId, practiceId } = await params;
+
+        if (!isValidObjectId(practiceId)) {
+            throw new ApiError(404, "invalid practice id");
+        }
+        const formData = await request.formData();
+
+        if (!formData) {
+            throw new ApiError(400, "Submission data is required");
+        }
+
+        const submissionFile = formData.get("submissionFile") as File;
+
+        if (!submissionFile) {
+            throw new ApiError(400, "Submission file is required");
+        }
+
         const tempFilePath = await saveBuffer(submissionFile);
+
+        if (!tempFilePath) {
+            throw new ApiError(500, "Error saving submission file");
+        }
         const uploadedSubmissionFile = await uploadOnCloudinary(tempFilePath);
 
         if (!uploadedSubmissionFile) {
@@ -65,11 +75,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                 });
     } catch (error: unknown) {
 
-        console.error("Error creating classroom:", error);
+        console.error("Error submitting practice solution:", error);
         
         return NextResponse.
             json({
-                message: error instanceof ApiError ? error.message : "Error creating classroom"
+                message: error instanceof ApiError ? error.message : "Error submitting practice solution",
 
             },
                 {
