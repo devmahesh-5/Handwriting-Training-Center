@@ -1,16 +1,25 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import mongoose from "mongoose";
+import Classroom from '@/models/classroom.models.js'
+import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/db/index";
-import Classroom from "@/models/classroom.models";
 import getDataFromToken from "@/helpers/checkAuth";
-import mongoose, { isValidObjectId } from "mongoose";
 import { ApiError } from "@/utils/ApiError";
+import { isValidObjectId } from "mongoose";
+
 connectDB();
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+   
+    const { id } = await params;
+    const user = await getDataFromToken(req);
+
+    if(!isValidObjectId(id)){
+
+        throw new ApiError(400, "Invalid Classroom ID");
+    }
+
     try {
-        const user = await getDataFromToken(req);
-        
+
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");
         }
@@ -19,16 +28,11 @@ export async function GET(req: NextRequest) {
             throw new ApiError(401, "User is not verified");
         }
 
-
         const classroom = await Classroom.aggregate(
             [
                 {
                     $match: {
-                        $or: [
-                            { students: new mongoose.Types.ObjectId(user._id) },
-                            { teacher: new mongoose.Types.ObjectId(user._id) }
-                        ]
-
+                        _id: new mongoose.Types.ObjectId(id),
                     }
                 },
                 {
@@ -47,15 +51,7 @@ export async function GET(req: NextRequest) {
                         as: "teacher"
                     }
                 },
-                
-                {
-                    $lookup: {
-                        from: "courses",
-                        localField: "course",
-                        foreignField: "_id",
-                        as: "course"
-                    }
-                },
+
                 {
                     $lookup: {
                         from: "courses",
@@ -126,7 +122,7 @@ export async function GET(req: NextRequest) {
                 },
                 {
                     $addFields: {
-                        "totalXp":{
+                        "totalXp": {
                             $reduce: {
                                 input: "$practiceSet.practiceEntries",
                                 initialValue: 0,
@@ -146,32 +142,44 @@ export async function GET(req: NextRequest) {
                         createdAt: -1
                     }
                 }
-                
+
 
             ]
-        )
+        );
 
-       // console.log("Classroom Data:", classroom);
-        
-
-        if (!classroom || classroom.length === 0) {
-            throw new ApiError(404, "No classroom found for this student");
+        if (!classroom) {
+            throw new ApiError(404, "Classroom not found");
         }
 
-        return NextResponse.json({
-            message: "Classroom fetched successfully",
-            classroom
-        }, {
-            status: 200
-        });
+        return NextResponse
+            .json({
+                message: "Classroom fetched successfully",
+                classroom,
+
+            }, {
+                status: 200
+            });
 
     } catch (error: unknown) {
-        console.error("Error creating classroom:", error);
-        return NextResponse.
-            json({
-                message: error instanceof ApiError ? error.message : "Error creating classroom"
+
+        if (error instanceof ApiError) {
+
+            return NextResponse.json({
+                message: error.message
+            }, {
+                status: error.statusCode
+            });
+
+        }else{
+
+            return NextResponse.json({
+                message: "Internal Server Error"
             }, {
                 status: 500
             });
+
+        }
+
+
     }
 }

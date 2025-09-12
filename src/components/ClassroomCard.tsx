@@ -1,6 +1,5 @@
 'use client'
 import React from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 interface Teacher {
   fullName: string;
@@ -14,6 +13,7 @@ interface Course {
 }
 
 interface Props {
+  id?: string;
   title: string;
   xp: number;
   currentXp?: number;
@@ -25,8 +25,8 @@ interface Props {
 }
 
 function ClassroomCard(props: Props) {
-  
     const {
+        id,
         title,
         currentXp = 0,
         xp,
@@ -39,8 +39,9 @@ function ClassroomCard(props: Props) {
      const progressPercentage = Math.min(Math.round((currentXp / xp) * 100), 100);
    
     const router = useRouter();
-
+    console.log({props});
   return (
+    
     <div 
       className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-300 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg"
       
@@ -128,7 +129,7 @@ function ClassroomCard(props: Props) {
         {/* Continue button - appears on hover */}
         <button 
           className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-[#F2F4F7] dark:hover:bg-indigo-600 text-[#60A5FA] py-2 px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center cursor-pointer"
-          onClick={()=>router.push(`/classrooms`)}
+          onClick={()=>router.push(`/my-classroom/${id}`)}
         >
           Continue Learning
           <span className="ml-2">→</span>

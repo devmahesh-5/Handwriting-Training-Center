@@ -15,16 +15,16 @@ export default function Header() {
     const [error, setError] = useState(null);
 
     const navItems = [
-        { name: 'Home', slug: '/', active: authStatus },
+        { name: 'Home', slug: '/home', active: authStatus },
         { name: 'Course', slug: '/course', active: authStatus },
-        { name: 'Dashboard', slug: '/dashboard', active: authStatus },
+        { name: 'About', slug: '/', active: authStatus },
         { name: 'Self', slug: '/self-learning', active: authStatus },
     ];
 
 
     return (
         <header className={`bg-[#F2F4F7] dark:bg-gray-900 dark:text-[#F2F4F7] sticky top-0 z-50`}>
-            <nav className='flex flex-row justify-between items-center mx-auto w-full px-4 py-3 sm:w-11/12 lg:w-10/12 md:py-4'>
+            <nav className='flex flex-row justify-between items-center mx-auto w-full px-4 py-3 w-11/12 md:py-4'>
                 {/* Logo */}
                 <div className='flex flex-row items-center'>
                     <Image
@@ -86,7 +86,7 @@ export default function Header() {
                             className="w-12 h-12 rounded-full object-cover border-2 border-blue-100 dark:border-gray-600 left-0 top-0"
                         />
                         {
-                            authStatus && (
+                             (
                                 <LogoutBtn />
                             )
                         }

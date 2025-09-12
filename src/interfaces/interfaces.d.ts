@@ -25,18 +25,18 @@ interface User {
 }
 
 interface Classroom {
-    _id: string,
-    name: string,
-    description: string,
-    teacher: string,
-    students: string[],//array
-    course: string,
-    payment: string,
-    subscription: string,
-    status: string,
-    createdAt: date,
-    updatedAt: date,
-    __v: number
+    _id: string;
+    name: string;
+    description: string;
+    students: User[];
+    status: 'active' | 'inactive' | 'archived';
+    teacher: User;
+    practiceSet: PracticeSet;
+    course?: Course;
+    totalXp: number;
+    createdAt: Date;
+    updatedAt: Date;
+    __v: number;
 }
 
 interface Course {
@@ -77,4 +77,41 @@ interface userData {
     isVerified: boolean,
     profilePicture: string | null,
     
+}
+
+interface Practice {
+    _id: string,
+    title: string,
+    instruction: string,
+    image: string,
+    difficulty: string,
+    tags: string[],
+    xp: number,
+    video:string,
+    createdAt: date,
+    updatedAt: date,
+    __v: number
+}
+
+
+interface PracticeEntry {
+    _id: string,
+    practice: Practice,
+    status: string,
+    day: number,
+    totalMarks: number
+}
+
+interface PracticeSolution {
+    _id: string,
+    student: User,
+    classroom: Classroom,
+    practice: Practice,
+    submissionFile: string,
+    marks?: number | 0,
+    status: string,
+    feedback?: string | null,
+    createdAt: date,
+    updatedAt: date,
+    __v: number
 }

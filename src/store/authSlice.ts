@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// 1. Define types
+// type for user data and auth state
 interface UserData {
   id: string;
   name: string;
   email: string;
-  // Add other user properties as needed
+  
 }
 
 interface AuthState {
@@ -13,13 +13,13 @@ interface AuthState {
   userData: UserData | null;
 }
 
-// 2. Initial state with type
+// initial state
 const initialState: AuthState = {
   status: false,
   userData: null,
 };
 
-// 3. Create slice with proper typing
+//auth slice with reducers for login and logout
 const authSlice = createSlice({
   name: "auth",
   initialState,

@@ -53,6 +53,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 }
 
+//remove practice entry from practice set
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string, practiceEntryId: string }> }){
     try {
         const { _id: userId } = await getDataFromToken(req);

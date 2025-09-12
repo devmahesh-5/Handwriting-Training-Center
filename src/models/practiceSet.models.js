@@ -14,10 +14,12 @@ const practiceSetSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Course'
         },
-        practiceEntry:{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'PracticeEntry'
-        }
+        practiceEntry:[
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'PracticeEntry'
+            }
+        ]
         
     },
     {

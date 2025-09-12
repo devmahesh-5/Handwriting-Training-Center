@@ -25,7 +25,7 @@ const LogoutBtn = () => {
 
     return !loading ? (
   <button 
-    className="bg-[#6C48E3] hover:bg-gray-700 text-white text-sm font-medium py-1.5 px-3 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer inline-flex items-center"
+    className="bg-[#6C48E3] hover:bg-gray-700 text-white text-sm font-medium py-1.5 px-3 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer inline-flex items-center dark:hover:bg-[#F2F4F7] dark:hover:text-[#6C48E3]"
     onClick={handleLogout}
   >
     <MdLogout className="inline-block w-4 h-4 mr-1.5" />

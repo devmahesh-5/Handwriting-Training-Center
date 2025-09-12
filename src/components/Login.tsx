@@ -118,7 +118,7 @@ return !loading ? (
             <input
               id="password"
               type={passwordType}
-              className={`block w-full px-3 py-2.5 border ${errors.password ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm transition-colors text-black`}
+              className={`block w-full px-3 py-2.5 border ${errors.password ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm transition-colors text-black dark:bg-[#F2F4F7] dark:text-[#F2F4F7] dark:placeholder-[#F2F4F7] dark:bg-gray-800`}
               placeholder="••••••••"
               {...register("password", {
                 required: "Password is required",

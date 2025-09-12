@@ -37,8 +37,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
 
   const signUp = async (data: SignupFormFields) => {
-    setLoading(true);
-    setError(null);
+
     const formData = new FormData();
     formData.append("fullName", data.fullName);
     formData.append("email", data.email);
@@ -51,10 +50,12 @@ export default function SignupPage() {
       formData.append("profilePicture", data.profilePicture[0]);
     }
     try {
+      setLoading(true);
+      setError(null);
       const userSession = await axios.post('/api/users/register', formData);
-      
+
       router.push('/auth/login');
-      
+
       toast.success("Account created successfully!");
     } catch (error: unknown) {
       console.error("Signup error:", error);
@@ -101,7 +102,7 @@ export default function SignupPage() {
                 type="text"
                 label="Full Name"
                 placeholder="John Doe"
-                {...register("fullName", { 
+                {...register("fullName", {
                   required: "Full name is required",
                   minLength: {
                     value: 2,
@@ -243,7 +244,7 @@ export default function SignupPage() {
                     <span className="text-xs text-center text-gray-500">
                       {watch('profilePicture')  // solve the issue
 
-                        ? watch('profilePicture')?.[0]?.name 
+                        ? watch('profilePicture')?.[0]?.name
                         : 'Click to upload (JPG, PNG)'}
                     </span>
                     <input
@@ -278,7 +279,7 @@ export default function SignupPage() {
           <button
             type="submit"
             className={`w-full py-3 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-[#6C48E3] hover:text-white bg-white border border-[#6C48E3] dark:bg-[#F2F4F7] dark:hover:bg-[#6C48E3] dark:text-[#6C48E3] dark:hover:text-[#F2F4F7] text-gray-600`}
-            
+
           >
             Create Account
           </button>

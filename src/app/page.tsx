@@ -18,7 +18,7 @@ export default function LandingPage() {
   useEffect(()=>{
     const fetchUser = async () => {
       try {
-        
+        setLoading(true);
         const user = await axios.get('/api/users/me');
         setUser(user.data.user);
         dispatch(login(user.data.user));
@@ -93,7 +93,7 @@ export default function LandingPage() {
             !authStatus ?(<Link href="/auth/signup" className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800">
             Join now
           </Link>):(
-            <Link href="/users/me" className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800">
+            <Link href="/home" className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800">
             Dashboard
           </Link>
           )}

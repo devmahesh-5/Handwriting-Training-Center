@@ -8,8 +8,8 @@ import CourseCard from '@/components/CourseCard';
 import PracticeCard from '@/components/PracticeCard';
 import axios, { AxiosError } from 'axios';
 import { login, logout } from '@/store/authSlice';
-
 interface Classroom {
+  _id?: string;
   name: string;
   status: 'active' | 'completed' | 'locked';
   description: string;
@@ -85,7 +85,7 @@ function DashboardPage() {
       return response?.data?.classroom?.[0];
 
     } catch (error: unknown) {
-      console.error("Error fetching user classrooms:", error);
+      
       if (error instanceof AxiosError) {
         setError(error.response?.data?.message || "An error occurred while fetching classrooms");
       }
@@ -171,7 +171,7 @@ function DashboardPage() {
       <Header />
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto w-full px-4 py-3 sm:w-11/12 mt-10 '>
         <ClassroomCard
-
+          id={userClassrooms?._id}
           title={userClassrooms?.name || "Unknown Classroom"}
           currentXp={userClassrooms?.totalXp || 10}
           status={userClassrooms?.status || "locked"}
@@ -204,7 +204,7 @@ function DashboardPage() {
         />
 
         <section className='col-span-1 md:col-span-2 lg:col-span-2 flex flex-col gap-4'>
-
+        <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>Practice Sets : Learn By Doing</h2>
           {
             Practice?.map((practice, index) => (
               <PracticeCard

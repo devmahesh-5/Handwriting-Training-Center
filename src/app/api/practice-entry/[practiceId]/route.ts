@@ -18,7 +18,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             throw new ApiError(404, "Practice not found");
         }
 
-        const { totalMarks } = practice;
+        const totalMarks = practice.xp;
         
 
         if (!day || !totalMarks || !practiceId) {
@@ -62,3 +62,4 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
     }
 }
+

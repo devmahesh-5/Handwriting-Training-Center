@@ -10,7 +10,6 @@ import { ApiError } from "@/utils/ApiError";
 connectDB();
 
 export default async function getDataFromToken(request: NextRequest) {
-    
 
     try {
         const accessToken = request.cookies.get("accessToken")?.value || "";

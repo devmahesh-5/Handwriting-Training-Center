@@ -25,7 +25,6 @@ export async function POST(req: NextRequest) {
             duration: string;
         };
 
-        console.log("1st", user);
 
         if (!user) {
             throw new ApiError(401, "User Session expired or not logged in");
@@ -35,7 +34,6 @@ export async function POST(req: NextRequest) {
             throw new ApiError(401, "User is not verified");
         }
 
-        console.log("2nd", user);
         const { name, description, type, price, duration } = body;
 
         if ([name, description, type, price, duration].some(field => !field || field === undefined)) {

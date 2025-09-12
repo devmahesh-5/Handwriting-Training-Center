@@ -98,8 +98,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 // export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string, practiceEntryId: string }> }) {
 //     try {
 
-//         const { _id: userId,practiceEntryId } = await getDataFromToken(req);
+//         const { _id: userId } = await getDataFromToken(req);
+
 //         const { id } = await params;
+
+//         const practiceEntryId = new URL(req.url).searchParams.get("practiceEntryId");
+
 //         if (!isValidObjectId(userId)) {
 //             throw new ApiError(404, "user not Authenticated")
 //         }

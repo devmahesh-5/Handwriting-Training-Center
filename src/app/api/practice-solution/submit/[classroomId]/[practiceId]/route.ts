@@ -26,7 +26,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             throw new ApiError(400, "User is not verified");
         }
 
-        if(user.role !== "student") {
+        if(user.role !== "Student") {
             throw new ApiError(403, "Only students can submit practice solutions");
         }
 
@@ -58,12 +58,29 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             throw new ApiError(500, "Error uploading submission file");
         }
 
-        const practiceSolution = await StudentSolution.create({
+        const existingSolution = await StudentSolution.findOne({
+            student: user._id,
+            classroom: classroomId,
+            practice: practiceId
+        });
+        let practiceSolution;
+
+        if (existingSolution) {
+            // If a solution already exists, update it
+            practiceSolution = await StudentSolution.findByIdAndUpdate(existingSolution._id, {
+                submissionFile: uploadedSubmissionFile.secure_url,
+                status: 'Pending', // Reset status to 'Submitted' on resubmission
+                feedback: '', // Clear previous feedback
+                marks: null // Clear previous marks
+            }, { new: true });
+        } else {
+            practiceSolution = await StudentSolution.create({
             student: user._id,
             classroom: classroomId,
             practice: practiceId,
             submissionFile: uploadedSubmissionFile.secure_url
         });
+    }
 
         return NextResponse.
             json({
