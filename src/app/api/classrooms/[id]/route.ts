@@ -8,7 +8,7 @@ import { isValidObjectId } from "mongoose";
 
 connectDB();
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
    
     const { id } = await params;
     const user = await getDataFromToken(req);
