@@ -20,7 +20,7 @@ type Stroke = {
 
 export default function BoardPage({ params }: { params: Promise<{ classroomId: string; boardId: string }> }) {
   const userData = useSelector((state: { auth: { status: boolean; userData: userData; } }) => state.auth.userData);
-  
+
   const { boardId } = React.use(params) as unknown as { boardId: string };
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -124,7 +124,7 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
         }
 
         // create socket inside effect (and type it with ReturnType<typeof io>)
-        const socket = io("https://handwriting-training-center.vercel.app/", { path: "/socketio", transports: ["websocket", "polling"] });
+        const socket = io("https://signaling-server-for-ht-center.onrender.com", { path: "/socketio", transports: ["websocket", "polling"] });
         socketRef.current = socket;
 
         socket.on("connect", () => {

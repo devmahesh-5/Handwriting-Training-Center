@@ -19,7 +19,7 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
 
   useEffect(() => {
     // Create socket inside effect (per-instance)
-    const socket = io("https://handwriting-training-center.vercel.app/", {
+    const socket = io("https://signaling-server-for-ht-center.onrender.com", {
       path: "/socketio",
       transports: ["websocket", "polling"],
     });
