@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import Header from '@/components/Header';
 import { MdCall, MdMessage } from 'react-icons/md';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import PracticeEntryCard from '@/components/PracticeEntryCard';
 
@@ -16,22 +16,22 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [classroom, setClassroom] = useState<Classroom | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const Router = useRouter();
     const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
-    
-    const {id} = React.use(params);
-    
+
+    const { id } = React.use(params);
+
     const date = new Date().getHours();
 
     useEffect(() => {
         ; (
             async () => {
                 try {
-                    
+
                     setLoading(true);
                     const response = await axios.get(`/api/classrooms/${id}`);
-                    console.log("Classroom Response:", response.data);
-                    
+                    //console.log("Classroom Response:", response.data);
+
                     setClassroom(response.data.classroom[0]);
                     setLoading(false);
                 } catch (error: unknown) {
@@ -46,14 +46,36 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
         return () => { }
 
-    },[]);
-    return !loading?(
+    }, []);
+
+    const startWhiteboard = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.post(`/api/whiteboard/create`, {
+                classroomId: classroom?._id,
+                name: `${classroom?.name} -Whiteboard`,
+                owner: userData?._id
+            });
+
+            Router.push(`/my-classroom/whiteboard/${classroom?._id}/${response.data.whiteboard._id}`);
+
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                setError(error.response?.data?.message || 'An error occurred while fetching classroom data.');
+            }
+        } finally {
+            setLoading(false);
+        }
+
+    }
+
+    return !loading ? (
         <div className="px-4 md:px-8 lg:px-12 py-8 min-h-screen bg-gray-50 dark:bg-gray-900">
             <Header />
             <div className="max-w-7xl mx-auto flex justify-between items-center mb-8">
                 <div className="text-2xl font-bold text-gray-900 dark:text-white flex items-center hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg px-4 py-2 cursor-pointer">
                     {
-                        date< 12 ? '🌞 Good Morning' : date < 18 ? '🌞 Good Afternoon' : '🌞 Good Evening'
+                        date < 12 ? '🌞 Good Morning' : date < 18 ? '🌞 Good Afternoon' : '🌞 Good Evening'
                     }
                     {
                         userData?.fullName ? `, ${userData.fullName.split(' ')[0]}` : ''
@@ -62,44 +84,16 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 <div className="flex items-center space-x-4 mr-4">
                     <button>
                         <MdMessage className="text-2xl text-[#6c30d0] w-8 h-8 cursor-pointer" />
-                        
-                    </button>
-                    
-                {classroom?.status === 'active' && classroom?.teacher && classroom?.teacher.role === 'teacher' &&
-                    (
-                        <button
-                            className="
-                                    relative
-                                    bg-indigo-600 
-                                    text-white 
-                                    px-5 
-                                    py-2.5 
-                                    rounded-lg 
-                                    font-medium 
-                                    text-sm 
-                                    hover:bg-indigo-700 
-                                    active:bg-indigo-800 
-                                    focus-visible:outline-none 
-                                    focus-visible:ring-2 
-                                    focus-visible:ring-indigo-500 
-                                    focus-visible:ring-offset-2 
-                                    transition-all 
-                                    duration-200
-                                    shadow-sm
-                                    hover:shadow-md
-                                    group
-                                    overflow-hidden
-                                    cursor-pointer
-                                "
-                        >
-                            <span className="relative z-10 flex items-center justify-center">
-                                Start Class Call
-                                <MdCall className="ml-2 text-lg" />
-                            </span>
 
-                        </button>
-                    )
-                }
+                    </button>
+
+                    {classroom?.status === 'active' &&
+                        (
+                            <button onClick={startWhiteboard}>
+                                <MdCall className="text-2xl text-[#6c30d0] w-8 h-8 cursor-pointer" />
+                            </button>
+                        )
+                    }
                 </div>
 
             </div>
@@ -169,7 +163,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                             </p>
                         </div>?
 
-                        {classroom?.practiceSet?.practiceEntries?.map((entry:PracticeEntry) => (
+                        {classroom?.practiceSet?.practiceEntries?.map((entry: PracticeEntry) => (
                             <PracticeEntryCard
                                 classroomId={classroom._id}
                                 key={entry._id}
@@ -264,10 +258,10 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 </div>
             </div>
         </div>
-    ) :(
+    ) : (
         <div className="flex items-center justify-center min-h-screen">
             <div className="text-center">
-                <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mx-auto mb-4"></div>  
+                <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mx-auto mb-4"></div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Loading Classroom...</h2>
                 <p className="text-gray-600 dark:text-gray-300">Please wait while we fetch the classroom data for you.</p>
             </div>
