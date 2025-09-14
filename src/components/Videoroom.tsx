@@ -1,30 +1,50 @@
 import { useEffect, useRef, useState } from "react";
 import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash } from "react-icons/fa";
-import type { Socket } from "socket.io-client";
-import io from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 type PeerMap = { [socketId: string]: RTCPeerConnection };
 type StreamsMap = { [socketId: string]: MediaStream };
 
 // Socket event types
-interface OfferPayload { from: string; offer: RTCSessionDescriptionInit; }
-interface AnswerPayload { from: string; answer: RTCSessionDescriptionInit; }
-interface IceCandidatePayload { from: string; candidate: RTCIceCandidateInit; }
-interface UserJoinedPayload { socketId: string; }
-interface AllUsersPayload { users: string[]; }
-interface UserLeftPayload { socketId: string; }
+interface OfferPayload {
+  from: string;
+  offer: RTCSessionDescriptionInit;
+}
 
-export default function VideoRoom({ roomId }: { roomId: string }) {
+interface AnswerPayload {
+  from: string;
+  answer: RTCSessionDescriptionInit;
+}
+
+interface IceCandidatePayload {
+  from: string;
+  candidate: RTCIceCandidateInit;
+}
+
+interface UserJoinedPayload {
+  socketId: string;
+}
+
+interface AllUsersPayload {
+  users: string[];
+}
+
+interface UserLeftPayload {
+  socketId: string;
+}
+
+export default function VideoRoom({ roomId, userId }: { roomId: string; userId?: string }) {
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const peerConnections = useRef<PeerMap>({});
   const localStream = useRef<MediaStream | null>(null);
+
   const [peers, setPeers] = useState<StreamsMap>({});
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
 
   useEffect(() => {
-    const socket: Socket = io("https://signaling-server-for-ht-center.onrender.com", {
+    const socket = io("https://signaling-server-for-ht-center.onrender.com", {
       path: "/socketio",
       transports: ["websocket", "polling"],
     });
@@ -34,8 +54,6 @@ export default function VideoRoom({ roomId }: { roomId: string }) {
     async function startLocal() {
       try {
         localStream.current = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        console.log("✅ Local media obtained:", localStream.current);
-
         if (localVideoRef.current) localVideoRef.current.srcObject = localStream.current;
         socket.emit("join-call-room", { roomId });
       } catch (err) {
@@ -46,7 +64,7 @@ export default function VideoRoom({ roomId }: { roomId: string }) {
 
     function createPeerConnection(remoteId: string) {
       if (peerConnections.current[remoteId]) return peerConnections.current[remoteId];
-      console.log("Creating PeerConnection for:", remoteId);
+      console.log("Creating peer connection", remoteId);
       const pc = new RTCPeerConnection({
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
@@ -64,12 +82,16 @@ export default function VideoRoom({ roomId }: { roomId: string }) {
 
       pc.onicecandidate = (event) => {
         if (event.candidate && socketRef.current) {
-          socketRef.current.emit("ice-candidate", { to: remoteId, from: socketRef.current.id, candidate: event.candidate });
+          socketRef.current.emit("ice-candidate", {
+            to: remoteId,
+            from: socketRef.current.id,
+            candidate: event.candidate,
+          } as IceCandidatePayload & { to: string });
         }
       };
 
       pc.onconnectionstatechange = () => {
-        if (["disconnected", "failed", "closed"].includes(pc.connectionState)) {
+        if (pc.connectionState === "disconnected" || pc.connectionState === "failed" || pc.connectionState === "closed") {
           delete peerConnections.current[remoteId];
           setPeers((prev) => {
             const copy = { ...prev };
@@ -85,60 +107,56 @@ export default function VideoRoom({ roomId }: { roomId: string }) {
 
     // --- Socket events ---
     socket.on("all-users", async ({ users }: AllUsersPayload) => {
-      // Only existing users send offers to the new joining user
+      console.log("All users:", users);
       for (const remoteId of users) {
         const pc = createPeerConnection(remoteId);
-        try {
-          const offer = await pc.createOffer();
-          await pc.setLocalDescription(offer);
-          socket.emit("offer", { to: remoteId, from: socket.id, offer });
-        } catch (err) {
-          console.error("Offer error:", err);
-        }
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        socket.emit("offer", { to: remoteId, from: socket.id, offer });
       }
     });
 
     socket.on("user-joined", async ({ socketId }: UserJoinedPayload) => {
-      // New user joins: do NOT create offer immediately; existing users will send offers
-      createPeerConnection(socketId);
+      console.log("User joined:", socketId);
+      const pc = createPeerConnection(socketId);
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      socket.emit("offer", { to: socketId, from: socket.id, offer });
     });
 
     socket.on("offer", async ({ from, offer }: OfferPayload) => {
-      console.log("📥 Received offer from:", from, offer);
+      console.log("Received offer from:", from);
       const pc = createPeerConnection(from);
-      try {
-        if (pc.signalingState !== "stable") {
-          await pc.setLocalDescription({ type: "rollback" }); // rollback if needed
-        }
-        await pc.setRemoteDescription(new RTCSessionDescription(offer));
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        socket.emit("answer", { to: from, from: socket.id, answer });
-      } catch (err) {
-        console.error("Offer handling error:", err);
-      }
+      await pc.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      socket.emit("answer", { to: from, from: socket.id, answer });
+      console.log("Sending answer to:", from);
     });
 
     socket.on("answer", async ({ from, answer }: AnswerPayload) => {
-      console.log("📥 Received answer from:", from, answer);
+      console.log("Received answer from:", from);
       const pc = peerConnections.current[from];
       if (!pc) return;
+      if (pc.signalingState === "stable") {
+        console.warn("PC is already stable; cannot set remote description now.");
+        return;
+      }
       try {
-        if (pc.signalingState !== "have-local-offer") {
-          await pc.setLocalDescription({ type: "rollback" });
-        }
         await pc.setRemoteDescription(new RTCSessionDescription(answer));
+        console.log("Answer set successfully");
       } catch (err) {
         console.error("Error setting remote description:", err);
       }
     });
 
     socket.on("ice-candidate", async ({ from, candidate }: IceCandidatePayload) => {
-      console.log("📡 Received ICE candidate from", from, candidate);
+      console.log("Received ICE candidate from:", from);
       const pc = peerConnections.current[from];
       if (pc && candidate) {
         try {
           await pc.addIceCandidate(new RTCIceCandidate(candidate));
+          console.log("ICE candidate added successfully");
         } catch (err) {
           console.error("Error adding ICE candidate:", err);
         }
@@ -161,29 +179,31 @@ export default function VideoRoom({ roomId }: { roomId: string }) {
       Object.values(peerConnections.current).forEach((pc) => pc.close());
       peerConnections.current = {};
       localStream.current?.getTracks().forEach((t) => t.stop());
-      socketRef.current?.disconnect();
+      if (socketRef.current) socketRef.current.disconnect();
       socketRef.current = null;
     };
   }, [roomId]);
 
   const toggleMic = () => {
-    localStream.current?.getAudioTracks().forEach((t) => (t.enabled = !t.enabled));
+    if (!localStream.current) return;
+    localStream.current.getAudioTracks().forEach((t) => (t.enabled = !t.enabled));
     setMicOn((s) => !s);
   };
 
   const toggleCam = () => {
-    localStream.current?.getVideoTracks().forEach((t) => (t.enabled = !t.enabled));
+    if (!localStream.current) return;
+    localStream.current.getVideoTracks().forEach((t) => (t.enabled = !t.enabled));
     setCamOn((s) => !s);
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="p-4">
       <div className="mb-4">
         <div className="font-bold mb-1">You</div>
-        <video ref={localVideoRef} autoPlay playsInline muted className="w-48 h-36 bg-white" />
+        <video ref={localVideoRef} autoPlay playsInline muted className="w-48 h-36 bg-black" />
       </div>
 
-      <div className="flex space-x-4 flex-col">
+      <div className="grid grid-cols-2 gap-4">
         {Object.entries(peers).map(([id, stream]) => (
           console.log(stream),
           <div key={id}>
@@ -193,7 +213,9 @@ export default function VideoRoom({ roomId }: { roomId: string }) {
               playsInline
               className="w-48 h-36 bg-black"
               ref={(el) => {
-                if (el && stream && el.srcObject !== stream) el.srcObject = stream;
+                if (el && stream) {
+                  if (el.srcObject !== stream) el.srcObject = stream;
+                }
               }}
             />
           </div>
