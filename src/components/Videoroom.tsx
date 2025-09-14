@@ -225,43 +225,40 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
       <div className="mb-4">
         <div className="font-bold mb-1">You</div>
         <video ref={localVideoRef} autoPlay muted playsInline className="w-48 h-36 bg-black" />
+        <div className="flex space-x-4 mt-4">
+          <button onClick={toggleMic} className="p-2 bg-gray-800 text-white rounded">
+            {micOn ? <FaMicrophone /> : <FaMicrophoneSlash />}
+          </button>
+          <button onClick={toggleCam} className="p-2 bg-gray-800 text-white rounded">
+            {camOn ? <FaVideo /> : <FaVideoSlash />}
+          </button>
+        </div>
       </div>
 
-      <div className="flex space-x-4 flex-col z-10">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 z-10">
         {Object.entries(peers).map(([id, stream]) => (
-          console.log("stream", stream),
-          <div key={id}>
+          <div key={id} className="flex flex-col items-center">
             <div className="font-semibold text-xs mb-1">Participant: {id}</div>
             <video
               autoPlay
               playsInline
-              className="w-48 h-36 bg-black"
+              className="w-32 h-24 sm:w-48 sm:h-36 bg-black rounded"
               ref={(el) => {
                 if (!el) return;
                 if (stream && el.srcObject !== stream) {
-                  console.log("Attaching stream to video element for", id, stream);
                   el.srcObject = stream;
                   el.onloadedmetadata = () => {
                     el.play().catch(err => console.warn("video.play() failed:", err));
-                    console.log("onloadedmetadata - video play attempted for", id, "videoWidth:", el.videoWidth, "videoHeight:", el.videoHeight);
                   };
                 }
               }}
             />
-
-
           </div>
         ))}
       </div>
 
-      <div className="flex space-x-4 mt-4">
-        <button onClick={toggleMic} className="p-2 bg-gray-800 text-white rounded">
-          {micOn ? <FaMicrophone /> : <FaMicrophoneSlash />}
-        </button>
-        <button onClick={toggleCam} className="p-2 bg-gray-800 text-white rounded">
-          {camOn ? <FaVideo /> : <FaVideoSlash />}
-        </button>
-      </div>
+
+
     </div>
   );
 }
