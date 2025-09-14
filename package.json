@@ -2,7 +2,7 @@
   "name": "handwriting-trainning-center",
   "version": "0.1.0",
   "private": true,
-  "type":"module",
+  "type": "module",
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
@@ -15,6 +15,7 @@
     "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
+    "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.3",
     "multer": "^2.0.1",
@@ -28,6 +29,8 @@
     "react-redux": "^9.2.0",
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "unique-username-generator": "^1.4.0",
     "uuid": "^11.1.0"
   },
@@ -39,6 +42,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/redux-persist": "^4.0.0",
+    "@types/socket.io-client": "^1.4.36",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.4.1",

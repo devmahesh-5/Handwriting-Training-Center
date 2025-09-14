@@ -1,9 +1,10 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import io from "socket.io-client"; // named import (reliable)
 import axios from "axios";
-import {useSelector} from 'react-redux';
-import { MdBackspace, MdBrush,MdClear, MdRemove } from "react-icons/md";
+import { useSelector } from "react-redux";
+import { MdBackspace, MdBrush } from "react-icons/md";
+import VideoRoom from "@/components/Videoroom";
 
 type Stroke = {
   x0: number;
@@ -15,13 +16,18 @@ type Stroke = {
   isEraser?: boolean;
 };
 
-export default function BoardPage({ params }: { params: Promise<{ classroomId: string, boardId: string }> }) {
-  const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
-  const { boardId } = React.use(params);
+type userData = { role?: string; [k: string]: any };
+
+export default function BoardPage({ params }: { params: Promise<{ classroomId: string; boardId: string }> }) {
+  const userData = useSelector((state: { auth: { userData: userData } }) => state.auth.userData);
+  const { boardId } = React.use(params) as unknown as { boardId: string };
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
-  const socketRef = useRef<Socket | null>(null);
+
+  // Use ReturnType<typeof io> for socket typing to avoid Socket export issues
+  const socketRef = useRef<ReturnType<typeof io> | null>(null);
+
   const drawingRef = useRef<boolean>(false);
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
   const lastEmitAtRef = useRef(0);
@@ -33,33 +39,23 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
   const [error, setError] = useState<string | null>(null);
 
   // --- Draw stroke on canvas ---
-  // drawStrokeOnCanvas now saves/restores ctx state and always clears line dash
   const drawStrokeOnCanvas = (stroke: Stroke, emit = false) => {
     const ctx = ctxRef.current;
     const canvas = canvasRef.current;
     if (!ctx || !canvas) return;
 
-    ctx.save(); // keep previous state
+    ctx.save();
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.lineWidth = stroke.thickness ?? 2;
     ctx.strokeStyle = stroke.color ?? "black";
-    ctx.setLineDash([]); // ensure solid line
+    ctx.setLineDash([]);
 
-    // If eraser, draw using destination-out so it truly erases pixels
-    if (stroke.isEraser) {
-      ctx.globalCompositeOperation = "destination-out";
-    } else {
-      ctx.globalCompositeOperation = "source-over";
-    }
+    ctx.globalCompositeOperation = stroke.isEraser ? "destination-out" : "source-over";
 
-    // Draw a short quadratic curve between points instead of a tiny single-pixel segment.
-    // This helps remove "dashed" appearance when many small segments arrive from remote clients.
     ctx.beginPath();
     ctx.moveTo(stroke.x0, stroke.y0);
-
-    // Use midpoint smoothing for a nicer continuous appearance
     const midX = (stroke.x0 + stroke.x1) / 2;
     const midY = (stroke.y0 + stroke.y1) / 2;
     ctx.quadraticCurveTo(stroke.x0, stroke.y0, midX, midY);
@@ -77,10 +73,14 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
   // --- Throttle drawing ---
   const emitStrokeThrottled = (stroke: Stroke) => {
     const now = Date.now();
-    // emit at most every 20ms, but always draw locally immediately
-    drawStrokeOnCanvas(stroke, now - lastEmitAtRef.current > 0);
-    if (now - lastEmitAtRef.current > 20) {
+    // draw locally always
+    drawStrokeOnCanvas(stroke, false);
+    // emit at most every 20ms
+    if (now - lastEmitAtRef.current > 0) {
       lastEmitAtRef.current = now;
+      if (socketRef.current?.connected) {
+        socketRef.current.emit("drawing", { boardId, stroke });
+      }
     }
   };
 
@@ -92,14 +92,12 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
       const parent = canvas.parentElement ?? document.body;
       const w = Math.max(800, parent.clientWidth - 40);
       const h = Math.max(600, window.innerHeight - 200);
-      // canvas.width/height are in device pixels
       canvas.width = Math.round(w * ratio);
       canvas.height = Math.round(h * ratio);
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
       const ctx = canvas.getContext("2d");
       if (ctx) {
-        // Map CSS pixels to device pixels so we can draw using CSS coordinates
         ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
         ctxRef.current = ctx;
       }
@@ -119,13 +117,13 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
       try {
         // Fetch existing strokes
         const res = await axios.get(`/api/whiteboard/${boardId}`);
-        const board = res.data.whiteboard[0];
-        if (mounted && Array.isArray(board.drawing)) {
+        const board = Array.isArray(res.data.whiteboard) ? res.data.whiteboard[0] : res.data.whiteboard;
+        if (mounted && Array.isArray(board?.drawing)) {
           for (const s of board.drawing) drawStrokeOnCanvas(s as Stroke, false);
         }
 
-        // Connect socket (adjust path/URL if your server uses a different endpoint)
-        const socket = io({ path: "/socketio" });
+        // create socket inside effect (and type it with ReturnType<typeof io>)
+        const socket = io("https://handwriting-training-center.vercel.app/", { path: "/socketio", transports: ["websocket", "polling"] });
         socketRef.current = socket;
 
         socket.on("connect", () => {
@@ -133,14 +131,11 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
           socket.emit("join-board", boardId);
         });
 
-        // Remote drawing segments
-        socket.on("drawing", (payload: { stroke: Stroke }) => {
-          // payload might be just the stroke depending on your server implementation
+        socket.on("drawing", (payload: any) => {
           const stroke = (payload && (payload.stroke ?? payload)) as Stroke;
           drawStrokeOnCanvas(stroke, false);
         });
 
-        // Clear board event from server (broadcast by whoever pressed Clear)
         socket.on("clear-board", () => {
           const canvas = canvasRef.current!;
           const ctx = ctxRef.current!;
@@ -152,7 +147,7 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
         setIsLoaded(true);
       } catch (err: any) {
         console.error(err);
-        setError(err.message || "Error loading board");
+        setError(err?.response?.data?.message || err.message || "Error loading board");
       }
     }
 
@@ -160,11 +155,15 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
 
     return () => {
       mounted = false;
-      socketRef.current?.disconnect();
+      // cleanup socket
+      try {
+        socketRef.current?.disconnect();
+      } catch (e) {}
+      socketRef.current = null;
     };
   }, [boardId]);
 
-  // --- Mouse/touch ---
+  // --- Pointer handlers ---
   const getPointer = (e: React.MouseEvent | React.TouchEvent) => {
     const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
@@ -203,44 +202,48 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
     lastPosRef.current = null;
   };
 
-
   return (
     <div style={{ padding: 12 }}>
       <header style={{ display: "flex", gap: 12, marginBottom: 8 }}>
         <div>
-          Board id: <strong>{boardId.slice(16,-1)}</strong>
+          Board id: <strong>{boardId?.slice(0, 8) ?? "—"}</strong>
         </div>
-        { 
-        userData?.role === "Teacher" &&( 
-            <div className="flex gap-4">
-        <label>
-          Color
-          <input type="color" value={color} onChange={(e) => setColor(e.target.value)} style={{ marginLeft: 6 }} />
-        </label>
-        <label>
-          Thickness
-          <input type="range" min={1} max={30} value={thickness} onChange={(e) => setThickness(Number(e.target.value))} />
-        </label>
-        <button 
-    onClick={() => setIsEraser(!isEraser)}
-    className={`flex items-center justify-center px-4 py-2 rounded-md transition-colors ${isEraser ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'}`}
-  >
-    {!isEraser ? (
-      <>
-        <MdBrush className="mr-2" /> {/* Brush icon when in eraser mode */}
-        Brush
-      </>
-    ) : (
-      <>
-        <MdBackspace className="mr-2" /> {/* Eraser icon when in brush mode */}
-        Eraser
-      </>
-    )}
-  </button>
-        
-        </div>
-        )
-}
+        {userData?.role === "Teacher" && (
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <label>
+              Color
+              <input type="color" value={color} onChange={(e) => setColor(e.target.value)} style={{ marginLeft: 6 }} />
+            </label>
+            <label>
+              Thickness
+              <input type="range" min={1} max={30} value={thickness} onChange={(e) => setThickness(Number(e.target.value))} />
+            </label>
+            <button
+              onClick={() => setIsEraser(!isEraser)}
+              style={{
+                padding: "8px 12px",
+                borderRadius: 8,
+                background: isEraser ? "#fee2e2" : "#e0e7ff",
+                color: isEraser ? "#b91c1c" : "#3730a3",
+                display: "flex",
+                gap: 8,
+                alignItems: "center",
+              }}
+            >
+              {!isEraser ? (
+                <>
+                  <MdBrush />
+                  Brush
+                </>
+              ) : (
+                <>
+                  <MdBackspace />
+                  Eraser
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </header>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
@@ -258,7 +261,10 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
           onTouchEnd={handlePointerUp}
         />
       </div>
+
+      <div style={{ marginTop: 12 }}>
+        <VideoRoom roomId="room1" userId={Date.now().toString()} />
+      </div>
     </div>
   );
 }
-
