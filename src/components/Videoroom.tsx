@@ -235,7 +235,6 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
             <video
               autoPlay
               playsInline
-              muted // TEMPORARILY mute for autoplay test — remove later when confirmed
               className="w-48 h-36 bg-black"
               ref={(el) => {
                 if (!el) return;
