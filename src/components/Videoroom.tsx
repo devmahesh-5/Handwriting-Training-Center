@@ -76,9 +76,12 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
       localStream.current?.getTracks().forEach((track) => pc.addTrack(track, localStream.current as MediaStream));
 
       pc.ontrack = (ev) => {
+        console.log("Received remote track from", remoteId, ev.streams);
         const remoteStream = ev.streams[0];
+        remoteStream.getTracks().forEach((track) => console.log("Track kind:", track.kind));
         setPeers((prev) => ({ ...prev, [remoteId]: remoteStream }));
       };
+
 
       pc.onicecandidate = (event) => {
         if (event.candidate && socketRef.current) {
@@ -116,13 +119,12 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
       }
     });
 
-    socket.on("user-joined", async ({ socketId }: UserJoinedPayload) => {
+    socket.on("user-joined", ({ socketId }: UserJoinedPayload) => {
       console.log("User joined:", socketId);
-      const pc = createPeerConnection(socketId);
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      socket.emit("offer", { to: socketId, from: socket.id, offer });
+      // Just create the PeerConnection, no offer yet
+      createPeerConnection(socketId);
     });
+
 
     socket.on("offer", async ({ from, offer }: OfferPayload) => {
       console.log("Received offer from:", from);
@@ -135,20 +137,20 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
     });
 
     socket.on("answer", async ({ from, answer }: AnswerPayload) => {
-      console.log("Received answer from:", from);
       const pc = peerConnections.current[from];
       if (!pc) return;
-      if (pc.signalingState === "stable") {
-        console.warn("PC is already stable; cannot set remote description now.");
-        return;
-      }
       try {
+        if (pc.signalingState !== "have-local-offer") {
+          console.warn("PeerConnection not in 'have-local-offer', applying rollback");
+          await pc.setLocalDescription({ type: "rollback" });
+        }
         await pc.setRemoteDescription(new RTCSessionDescription(answer));
-        console.log("Answer set successfully");
+        console.log("Answer applied successfully");
       } catch (err) {
         console.error("Error setting remote description:", err);
       }
     });
+
 
     socket.on("ice-candidate", async ({ from, candidate }: IceCandidatePayload) => {
       console.log("Received ICE candidate from:", from);
@@ -200,12 +202,12 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
     <div className="p-4">
       <div className="mb-4">
         <div className="font-bold mb-1">You</div>
-        <video ref={localVideoRef} autoPlay playsInline muted className="w-48 h-36 bg-black" />
+        <video ref={localVideoRef} autoPlay playsInline className="w-48 h-36 bg-black" />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex space-x-4 flex-col z-10">
         {Object.entries(peers).map(([id, stream]) => (
-          console.log(stream),
+          console.log("stream",stream),
           <div key={id}>
             <div className="font-semibold text-xs mb-1">Participant: {id}</div>
             <video
@@ -213,11 +215,10 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
               playsInline
               className="w-48 h-36 bg-black"
               ref={(el) => {
-                if (el && stream) {
-                  if (el.srcObject !== stream) el.srcObject = stream;
-                }
+                if (el && stream && el.srcObject !== stream) el.srcObject = stream;
               }}
             />
+
           </div>
         ))}
       </div>

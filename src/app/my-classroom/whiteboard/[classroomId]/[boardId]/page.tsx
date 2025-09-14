@@ -251,7 +251,7 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
       </header>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
-      <div className="top-0 left-0 w-40 h-40">
+      <div className="top-0 left-0 w-full h-40">
         <VideoRoom roomId={boardId} />
       </div>
       <div className="relative w-full h-full border border-gray-300">
