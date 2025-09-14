@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client"; // named import (reliable)
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useSelector } from "react-redux";
 import { MdBackspace, MdBrush } from "react-icons/md";
 import VideoRoom from "@/components/Videoroom";
@@ -16,10 +16,11 @@ type Stroke = {
   isEraser?: boolean;
 };
 
-type userData = { role?: string; [k: string]: any };
+// type userData = { role?: string; _id?: string };
 
 export default function BoardPage({ params }: { params: Promise<{ classroomId: string; boardId: string }> }) {
-  const userData = useSelector((state: { auth: { userData: userData } }) => state.auth.userData);
+  const userData = useSelector((state: { auth: { status: boolean; userData: userData; } }) => state.auth.userData);
+  
   const { boardId } = React.use(params) as unknown as { boardId: string };
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -131,7 +132,7 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
           socket.emit("join-board", boardId);
         });
 
-        socket.on("drawing", (payload: any) => {
+        socket.on("drawing", (payload: { stroke: Stroke }) => {
           const stroke = (payload && (payload.stroke ?? payload)) as Stroke;
           drawStrokeOnCanvas(stroke, false);
         });
@@ -145,9 +146,12 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
         socket.on("disconnect", () => console.log("Socket disconnected"));
 
         setIsLoaded(true);
-      } catch (err: any) {
-        console.error(err);
-        setError(err?.response?.data?.message || err.message || "Error loading board");
+      } catch (err: unknown) {
+        if(err instanceof AxiosError){
+          setError(err.response?.data?.message || err.message);
+        }else{
+          setError(err as string);
+        }
       }
     }
 

@@ -50,18 +50,7 @@ interface Practice {
   updatedAt?: string;
   xp?: number;
 }
-interface userData {
-  _id: string;
-  fullName: string;
-  username: string;
-  email: string;
-  profilePicture: string | null;
-  phone: string;
-  isVerified: boolean;
-  role: string;
-  gender: string;
-  created_at?: string;
-}
+
 
 
 function DashboardPage() {

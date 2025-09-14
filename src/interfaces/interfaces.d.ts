@@ -67,16 +67,16 @@ interface Payment {
     __v: number
 }
 interface userData {
-    _id: string,
-    fullName: string,
-    email: string,
-    username: string,
-    phone: string,
-    gender: string,
-    role: string,
-    isVerified: boolean,
-    profilePicture: string | null,
-    
+  _id: string;
+  fullName: string;
+  username: string;
+  email: string;
+  profilePicture: string | null;
+  phone: string;
+  isVerified: boolean;
+  role: string;
+  gender: string;
+  created_at?: string;
 }
 
 interface Practice {
