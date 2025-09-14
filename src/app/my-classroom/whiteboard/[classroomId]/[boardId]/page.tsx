@@ -147,9 +147,9 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
 
         setIsLoaded(true);
       } catch (err: unknown) {
-        if(err instanceof AxiosError){
+        if (err instanceof AxiosError) {
           setError(err.response?.data?.message || err.message);
-        }else{
+        } else {
           setError(err as string);
         }
       }
@@ -162,7 +162,7 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
       // cleanup socket
       try {
         socketRef.current?.disconnect();
-      } catch (e) {}
+      } catch (e) { }
       socketRef.current = null;
     };
   }, [boardId]);
@@ -251,8 +251,11 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
       </header>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
+      <div className="top-0 left-0 w-40 h-40">
+        <VideoRoom roomId={boardId} />
+      </div>
+      <div className="relative w-full h-full border border-gray-300">
 
-      <div style={{ border: "1px solid #ccc", display: "inline-block" }}>
         <canvas
           ref={canvasRef}
           style={{ touchAction: "none", display: "block", background: "white" }}
@@ -264,11 +267,10 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
           onTouchMove={handlePointerMove}
           onTouchEnd={handlePointerUp}
         />
+
       </div>
 
-      <div style={{ marginTop: 12 }}>
-        <VideoRoom roomId="room1" userId={Date.now().toString()} />
-      </div>
+
     </div>
   );
 }
