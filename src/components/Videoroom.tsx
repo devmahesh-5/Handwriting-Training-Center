@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash } from "react-icons/fa";
 import { io, Socket } from "socket.io-client";
+import { useSelector } from "react-redux";
+
+type PeerInfo = {
+  stream: MediaStream;
+  name?: string;
+};
+
 
 type PeerMap = { [socketId: string]: RTCPeerConnection };
 type StreamsMap = { [socketId: string]: MediaStream };
@@ -23,23 +30,29 @@ interface IceCandidatePayload {
 
 interface UserJoinedPayload {
   socketId: string;
+  name: string;
 }
 
 interface AllUsersPayload {
-  users: string[];
+  users: { socketId: string; name: string }[];
 }
+
 
 interface UserLeftPayload {
   socketId: string;
 }
 
 export default function VideoRoom({ roomId, userId }: { roomId: string; userId?: string }) {
+
+  const userData: userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
+
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const peerConnections = useRef<PeerMap>({});
   const localStream = useRef<MediaStream | null>(null);
 
-  const [peers, setPeers] = useState<StreamsMap>({});
+  const [peers, setPeers] = useState<{ [socketId: string]: PeerInfo }>({});
+
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
 
@@ -55,7 +68,7 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
       try {
         localStream.current = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         if (localVideoRef.current) localVideoRef.current.srcObject = localStream.current;
-        socket.emit("join-call-room", { roomId });
+        socket.emit("join-call-room", { roomId, name: userData.fullName });
       } catch (err) {
         console.error("Could not get user media:", err);
       }
@@ -80,7 +93,10 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
         console.log("Received remote track from", remoteId, "stream:", remoteStream);
         remoteStream.getTracks().forEach(t => console.log(" → remote track", t.kind, "enabled:", t.enabled));
         // Save stream in state so React renders a video element for it
-        setPeers(prev => ({ ...prev, [remoteId]: remoteStream }));
+        setPeers(prev => ({
+          ...prev,
+          [remoteId]: { ...prev[remoteId], stream: remoteStream }
+        }));
 
         // Also request stats for debugging (non-blocking)
         try {
@@ -133,7 +149,11 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
     // --- Socket events ---
     socket.on("all-users", async ({ users }: AllUsersPayload) => {
       console.log("All users:", users);
-      for (const remoteId of users) {
+      for (const { socketId: remoteId, name } of users) {
+        setPeers(prev => ({
+          ...prev,
+          [remoteId]: { ...prev[remoteId], name }
+        }));
         const pc = createPeerConnection(remoteId);
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
@@ -141,11 +161,15 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
       }
     });
 
-    socket.on("user-joined", ({ socketId }: UserJoinedPayload) => {
+    socket.on("user-joined", ({ socketId, name }: UserJoinedPayload) => {
       console.log("User joined:", socketId);
-      // Just create the PeerConnection, no offer yet
+      setPeers(prev => ({
+        ...prev,
+        [socketId]: { ...prev[socketId], name }
+      }));
       createPeerConnection(socketId);
     });
+
 
 
     socket.on("offer", async ({ from, offer }: OfferPayload) => {
@@ -224,7 +248,13 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
     <div className="p-4">
       <div className="mb-4">
         <div className="font-bold mb-1">You</div>
-        <video ref={localVideoRef} autoPlay muted playsInline className="w-48 h-36 bg-black" />
+        <video
+          ref={localVideoRef}
+          autoPlay
+          muted
+          playsInline
+          className="w-32 h-24 sm:w-48 sm:h-36 bg-black rounded transform scale-x-[-1]"
+        />
         <div className="flex space-x-4 mt-4">
           <button onClick={toggleMic} className="p-2 bg-gray-800 text-white rounded">
             {micOn ? <FaMicrophone /> : <FaMicrophoneSlash />}
@@ -235,20 +265,36 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 z-10">
-        {Object.entries(peers).map(([id, stream]) => (
-          <div key={id} className="flex flex-col items-center">
-            <div className="font-semibold text-xs mb-1">Participant: {id}</div>
+      <div className="grid grid-cols-1 gap-4">
+        {Object.entries(peers).map(([id, peer]) => (
+          <div
+            key={id}
+            className="flex flex-col items-center cursor-pointer"
+            onClick={(e) => {
+              const video = e.currentTarget.querySelector("video");
+              if (!video) return;
+              if (video.classList.contains("fixed")) {
+                video.classList.remove("fixed", "inset-0", "z-50", "w-auto", "h-auto");
+                video.classList.add("w-48", "h-36");
+              } else {
+                video.classList.remove("w-48", "h-36");
+                video.classList.add("fixed", "inset-0", "z-50", "w-auto", "h-auto");
+              }
+            }}
+          >
+            <div className="font-semibold text-xs text-white mb-1">
+              {peer.name || `Participant: ${id}`}
+            </div>
             <video
               autoPlay
               playsInline
-              className="w-32 h-24 sm:w-48 sm:h-36 bg-black rounded"
+              className="w-32 h-24 sm:w-48 sm:h-36 bg-black rounded transform scale-x-[-1]"
               ref={(el) => {
                 if (!el) return;
-                if (stream && el.srcObject !== stream) {
-                  el.srcObject = stream;
+                if (peer.stream && el.srcObject !== peer.stream) {
+                  el.srcObject = peer.stream;
                   el.onloadedmetadata = () => {
-                    el.play().catch(err => console.warn("video.play() failed:", err));
+                    el.play().catch((err) => console.warn("video.play() failed:", err));
                   };
                 }
               }}
@@ -256,6 +302,7 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
           </div>
         ))}
       </div>
+
 
 
 

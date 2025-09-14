@@ -251,18 +251,12 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
       </header>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
-      <div className="top-0 left-0 w-full h-full z-50">
-        <VideoRoom roomId={boardId} />
-      </div>
-      <div className="relative w-full h-[60vh] sm:h-[75vh] border border-gray-300">
+<div className="flex w-full h-screen">
+      <div className="flex-1 border border-gray-300">
         <canvas
           ref={canvasRef}
           className="w-full h-full"
-          style={{
-            touchAction: "none",
-            display: "block",
-            background: "white",
-          }}
+          style={{ touchAction: "none", display: "block", background: "white" }}
           onMouseDown={handlePointerDown}
           onMouseMove={handlePointerMove}
           onMouseUp={handlePointerUp}
@@ -272,9 +266,11 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
           onTouchEnd={handlePointerUp}
         />
       </div>
+      <div className="w-1/4 p-2 overflow-y-auto bg-white">
+        <VideoRoom roomId={boardId} />
+      </div>
 
-
-
+</div>
     </div>
   );
 }
