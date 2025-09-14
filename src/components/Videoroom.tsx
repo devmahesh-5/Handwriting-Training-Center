@@ -273,16 +273,18 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
             onClick={(e) => {
               const video = e.currentTarget.querySelector("video");
               if (!video) return;
-              if (video.classList.contains("fixed")) {
-                video.classList.remove("fixed", "inset-0", "z-50", "w-auto", "h-auto");
-                video.classList.add("w-48", "h-36");
+
+              if (document.fullscreenElement) {
+                document.exitFullscreen();
               } else {
-                video.classList.remove("w-48", "h-36");
-                video.classList.add("fixed", "inset-0", "z-50", "w-auto", "h-auto");
+                video.requestFullscreen().catch((err) =>
+                  console.warn("Failed to enter fullscreen:", err)
+                );
               }
             }}
+
           >
-            <div className="font-semibold text-xs text-white mb-1">
+            <div className="font-semibold text-xs text-gray-600 mb-1">
               {peer.name || `Participant: ${id}`}
             </div>
             <video

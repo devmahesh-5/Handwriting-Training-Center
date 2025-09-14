@@ -3,8 +3,9 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client"; // named import (reliable)
 import axios, { AxiosError } from "axios";
 import { useSelector } from "react-redux";
-import { MdBackspace, MdBrush } from "react-icons/md";
+import { MdBackspace, MdBrush, MdCallEnd } from "react-icons/md";
 import VideoRoom from "@/components/Videoroom";
+import { useRouter } from "next/navigation";
 
 type Stroke = {
   x0: number;
@@ -21,7 +22,7 @@ type Stroke = {
 export default function BoardPage({ params }: { params: Promise<{ classroomId: string; boardId: string }> }) {
   const userData = useSelector((state: { auth: { status: boolean; userData: userData; } }) => state.auth.userData);
 
-  const { boardId } = React.use(params) as unknown as { boardId: string };
+  const { boardId, classroomId } = React.use(params) as unknown as { boardId: string, classroomId: string };
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -206,6 +207,8 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
     lastPosRef.current = null;
   };
 
+  const Router = useRouter();
+
   return (
     <div style={{ padding: 12 }}>
       <header style={{ display: "flex", gap: 12, marginBottom: 8 }}>
@@ -227,8 +230,8 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
               style={{
                 padding: "8px 12px",
                 borderRadius: 8,
-                background: isEraser ? "#fee2e2" : "#e0e7ff",
-                color: isEraser ? "#b91c1c" : "#3730a3",
+                background: !isEraser ? "#fee2e2" : "#e0e7ff",
+                color: !isEraser ? `${color}` : "#3730a3",
                 display: "flex",
                 gap: 8,
                 alignItems: "center",
@@ -248,6 +251,9 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
             </button>
           </div>
         )}
+        <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded pointer-cursor" onClick={()=>Router.push(`/my-classroom/${classroomId}`)}>
+          <MdCallEnd className="inline-block w-4 h-4" />
+        </button>
       </header>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
