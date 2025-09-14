@@ -76,11 +76,33 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
       localStream.current?.getTracks().forEach((track) => pc.addTrack(track, localStream.current as MediaStream));
 
       pc.ontrack = (ev) => {
-        console.log("Received remote track from", remoteId, ev.streams);
         const remoteStream = ev.streams[0];
-        remoteStream.getTracks().forEach((track) => console.log("Track kind:", track.kind));
-        setPeers((prev) => ({ ...prev, [remoteId]: remoteStream }));
+        console.log("Received remote track from", remoteId, "stream:", remoteStream);
+        remoteStream.getTracks().forEach(t => console.log(" → remote track", t.kind, "enabled:", t.enabled));
+        // Save stream in state so React renders a video element for it
+        setPeers(prev => ({ ...prev, [remoteId]: remoteStream }));
+
+        // Also request stats for debugging (non-blocking)
+        try {
+          const pcForStats = pc;
+          setTimeout(async () => {
+            try {
+              const receivers = pcForStats.getReceivers();
+              for (const r of receivers) {
+                const stats = await r.getStats();
+                stats.forEach(report => {
+                  if (report.type === "inbound-rtp") {
+                    console.log("Inbound RTP stats for", remoteId, report);
+                  }
+                });
+              }
+            } catch (sErr) {
+              console.warn("getStats failed", sErr);
+            }
+          }, 1000);
+        } catch { }
       };
+
 
 
       pc.onicecandidate = (event) => {
@@ -202,22 +224,32 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
     <div className="p-4">
       <div className="mb-4">
         <div className="font-bold mb-1">You</div>
-        <video ref={localVideoRef} autoPlay playsInline className="w-48 h-36 bg-black" />
+        <video ref={localVideoRef} autoPlay muted playsInline className="w-48 h-36 bg-black" />
       </div>
 
       <div className="flex space-x-4 flex-col z-10">
         {Object.entries(peers).map(([id, stream]) => (
-          console.log("stream",stream),
+          console.log("stream", stream),
           <div key={id}>
             <div className="font-semibold text-xs mb-1">Participant: {id}</div>
             <video
               autoPlay
               playsInline
+              muted // TEMPORARILY mute for autoplay test — remove later when confirmed
               className="w-48 h-36 bg-black"
               ref={(el) => {
-                if (el && stream && el.srcObject !== stream) el.srcObject = stream;
+                if (!el) return;
+                if (stream && el.srcObject !== stream) {
+                  console.log("Attaching stream to video element for", id, stream);
+                  el.srcObject = stream;
+                  el.onloadedmetadata = () => {
+                    el.play().catch(err => console.warn("video.play() failed:", err));
+                    console.log("onloadedmetadata - video play attempted for", id, "videoWidth:", el.videoWidth, "videoHeight:", el.videoHeight);
+                  };
+                }
               }}
             />
+
 
           </div>
         ))}
