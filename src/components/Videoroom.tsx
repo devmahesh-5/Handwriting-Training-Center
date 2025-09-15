@@ -57,6 +57,15 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
   const [camOn, setCamOn] = useState(true);
 
   useEffect(() => {
+  const interval = setInterval(() => {
+    fetch("https://signaling-server-for-ht-center.onrender.com/ping")
+      .catch(() => console.warn("Server might be asleep"));
+  }, 5 * 60 * 1000); // every 5 minutes
+
+  return () => clearInterval(interval);
+}, []);
+
+  useEffect(() => {
     const socket = io("https://signaling-server-for-ht-center.onrender.com", {
       path: "/socketio",
       transports: ["websocket", "polling"],
