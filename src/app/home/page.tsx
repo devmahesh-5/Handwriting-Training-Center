@@ -1,13 +1,13 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import Header from "@/components/Header";
 import { useSelector, useDispatch } from 'react-redux';
 import ClassroomCard from '@/components/ClassroomCard';
 import ProfileCard from '@/components/ProfileCard';
 import CourseCard from '@/components/CourseCard';
 import PracticeCard from '@/components/PracticeCard';
 import axios, { AxiosError } from 'axios';
-import { login, logout } from '@/store/authSlice';
+import Loading from '@/components/Loading';
+
 interface Classroom {
   _id?: string;
   name: string;
@@ -54,7 +54,7 @@ interface Practice {
 
 
 function DashboardPage() {
-  const dispatch = useDispatch();
+
   const authStatus = useSelector((state: { auth: { status: boolean; userData: userData; } }) => state.auth.status);
 
   const userData: userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
@@ -113,30 +113,6 @@ function DashboardPage() {
   }
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setLoading(true);
-        const user = await axios.get('/api/users/me');
-        setUser(user.data.user);
-
-        dispatch(login(user.data.user));
-
-      } catch (error) {
-        setUser(null);
-
-        dispatch(logout());
-      } finally {
-        setLoading(false);
-      }
-
-    }
-    fetchUser();
-
-    return () => { }
-
-  }, [dispatch]);
-
-  useEffect(() => {
     ; (
       async () => {
         if (authStatus) {
@@ -157,38 +133,37 @@ function DashboardPage() {
   //remember to add course to classroom
   return !loading ? (
     <main className="min-h-screen dark:bg-gray-900 bg-[#F2F4F7] loading-lazy">
-      <Header />
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto w-full px-4 py-3 sm:w-11/12 mt-10 '>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto w-full px-4 py-3 sm:w-11/12'>
         <ClassroomCard
           id={userClassrooms?._id}
           title={userClassrooms?.name || "Unknown Classroom"}
           currentXp={userClassrooms?.totalXp || 10}
           status={userClassrooms?.status || "locked"}
           xp={userClassrooms?.totalXp || 100}
-          duration={userClassrooms?.course?.duration || "Not mentioned"}
-          description={userClassrooms?.description || "Not mentioned"}
-          course={userClassrooms?.course || { name: "Not mentioned", duration: "Not mentioned", thumbnail: "/course.png" }}
-          teacher={userClassrooms?.teacher || { fullName: "Not mentioned", profilePicture: "/profile.png" }}
+          duration={userClassrooms?.course?.duration || "N/A"}
+          description={userClassrooms?.description || "N/A"}
+          course={userClassrooms?.course || { name: "N/A", duration: "N/A", thumbnail: "/course.png" }}
+          teacher={userClassrooms?.teacher || { fullName: "N/A", profilePicture: "/profile.png" }}
         />
 
         <CourseCard
           _id={userCourses?._id}
-          title={userCourses?.name || "Course 1"}
+          title={userCourses?.name || "N/A"}
           duration={userCourses?.duration}
-          description={userCourses?.description || "Not mentioned"}
+          description={userCourses?.description || "N/A"}
           thumbnail={userCourses?.thumbnail || '/course.png'} />
 
         <ProfileCard
 
-          fullName={user?.fullName || "Unknown User"}
-          profilePicture={user?.profilePicture || "/profile.png"}
-          email={user?.email || "Not mentioned"}
-          gender={user?.gender || "Not mentioned"}
-          username={user?.username || "Unknown User"}
-          phone={user?.phone || "Not mentioned"}
-          role={user?.role || "Not mentioned"}
-          isVerified={user?.isVerified || false}
-          memberSince={user?.created_at || "2025"} // Default if not provided
+          fullName={userData?.fullName || "N/A"}
+          profilePicture={userData?.profilePicture || "/profile.png"}
+          email={userData?.email || "N/A"}
+          gender={userData?.gender || "N/A"}
+          username={userData?.username || "N/A"}
+          phone={userData?.phone || "N/A"}
+          role={userData?.role || "N/A"}
+          isVerified={userData?.isVerified || false}
+          memberSince={userData?.created_at || "2025"} // Default if not provided
 
         />
 
@@ -213,9 +188,7 @@ function DashboardPage() {
 
     </main>
   ) : (
-    <div className="flex items-center justify-center min-h-screen">
-      <p className="text-gray-500 dark:text-gray-300">Loading...</p>
-    </div>
+    <Loading />
   )
 }
 

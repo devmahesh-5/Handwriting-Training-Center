@@ -10,73 +10,12 @@ import Logo from "@/components/LOGO";
 
 
 export default function LandingPage() {
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const dispatch = useDispatch();
   const authStatus = useSelector((state: { auth: { status: boolean; userData: userData; }}) => state.auth.status);
-  const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; })=>state.auth.userData);
-  useEffect(()=>{
-    const fetchUser = async () => {
-      try {
-        setLoading(true);
-        const user = await axios.get('/api/users/me');
-        setUser(user.data.user);
-        dispatch(login(user.data.user));
-      } catch (error) {
-        setUser(null);
-        dispatch(logout());
-      }finally{
-        setLoading(false);
-      }
-
-    }
-    fetchUser();
-
-    return () => {}
-
-  },[dispatch]);
-
-
-    const handleLogout = async() => {
-    try {
-      const response = await axios.post('/api/users/logout');
-      dispatch(logout());
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
 
   return (
     <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-      {/* Hero Section */}
-      <header className="bg-white dark:bg-gray-900">
-        <nav className="max-w-5xl mx-auto flex  items-center justify-between p-4">
-          
-          <div className="flex items-center">
-            <Logo />
-          </div>
-{authStatus ?(
-          <div className="flex items-center gap-4">
-            <button 
-            className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800"
-            onClick={() => handleLogout()}
-            >
-              Log Out
-            </button>
-          </div>
-           ):(
-            <div className="flex items-center gap-4">
-            <Link href="/auth/login" className="px-6 py-3 border border-blue-600 rounded-xl bg-white hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800 dark:text-[#082845]">
-              Log In
-            </Link>
-            <Link href="/auth/signup" className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800">
-              Sign Up
-            </Link>
-          </div>
-           )}
-        </nav>
-      </header>
+
       
       <section className="flex flex-col items-center justify-center text-center py-24 px-4">
 

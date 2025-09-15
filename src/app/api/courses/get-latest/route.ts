@@ -17,9 +17,9 @@ export async function GET(req: NextRequest) {
             throw new ApiError(401, "User Session expired or not logged in");
         }
 
-        if (user.isVerified === false) {
-            throw new ApiError(401, "User is not verified");
-        }
+        // if (!user.isVerified) {
+        //     throw new ApiError(401, "User is not verified");
+        // } need to check
 
         const latestCourses = await Course.find({})
             .sort({ createdAt: -1 })

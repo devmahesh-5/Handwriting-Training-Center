@@ -93,7 +93,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     try {
         //for teacher marking
         const { id } = await params;
-        const { status, feedback, marks } = await request.json();
+        const {feedback, marks } = await request.json();
         // const studentId = request.nextUrl.searchParams.get("studentId");
         const { _id: userId } = await getDataFromToken(request);
 
@@ -103,14 +103,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         if (!user || !isValidObjectId(id)) {
             throw new ApiError(404, "User not Found")
         }
+        //later change this
 
-        if (!user.isVerified || user.role !== "teacher") {
+        if (!user.isVerified || user.role !== "Teacher") {
             throw new ApiError(401, "User not authorized to mark the practice solution")
         }
 
         const updatedPracticeSolution = await StudentSolution.findByIdAndUpdate(id, {
             $set: {
-                status,
+                status:'Checked',
                 feedback,
                 marks
             }

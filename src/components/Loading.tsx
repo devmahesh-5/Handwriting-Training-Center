@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 
-export default function Loading() {
+export default function Loading({message}: {message: string | null}) {
 
     const tips = [
         "Hold your pen comfortably – not too tight, not too loose. A relaxed grip reduces hand fatigue.",
@@ -28,7 +28,7 @@ export default function Loading() {
         const interval = setInterval(() => {
             const newTip = tips[Math.floor(Math.random() * tips.length)];
             setCurrentTip(newTip);
-        }, 4000); // Change tip every 4 seconds
+        }, 4000); // Change tip every 5 seconds
 
         return () => clearInterval(interval);
     }, []);
@@ -62,7 +62,7 @@ export default function Loading() {
                     </div>
 
                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2 animate-pulse">
-                        Loading Your Experience
+                        {message || "Bringing you closer to perfect handwriting..."}
                     </h1>
                     <p className="text-gray-600 animate-pulse dark:text-gray-400">
                         Preparing everything for you...

@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import axios, { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
-import { watch } from 'fs';
-import User from '@/models/users.models';
 import { useSelector } from 'react-redux';
 import Evaluation from '@/components/Evaluation';
+
+import Loading from '@/components/Loading';
 
 interface submissionData {
   submissionFile?: FileList | null;
@@ -42,19 +42,27 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
 
   const { classroomId, practiceEntryId } = React.use(params);
 
+  const [solutionLoading, setSolutionLoading] = useState(false);
+
   const fetchSolutions = async (practiceId: string) => {
     try {
+      setError(null);
+      setSolutionLoading(true);
       const response = await axios.get(`/api/practice-solution/students/${classroomId}?practiceId=${practiceId}`);
       setPracticeSolutions(response?.data?.solutions);
     } catch (error: unknown) {
       error instanceof AxiosError
         ? setError(error?.response?.data?.message)
         : setError("Something went wrong while fetching solutions");
+    }finally{
+      setSolutionLoading(false);
     }
   }
 
   const fetchMySolution = async (practiceId: string) => {
     try {
+      setError(null);
+      setSolutionLoading(true);
       const response = await axios.get(`/api/practice-solution/my-solution/${classroomId}/${practiceId}`);
       const mySolution = response?.data?.solutions;
 
@@ -66,6 +74,8 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
       error instanceof AxiosError
         ? setError(error?.response?.data?.message)
         : setError("Something went wrong while fetching solutions");
+    }finally{
+      setSolutionLoading(false);
     }
   }
 
@@ -117,7 +127,6 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
   }, [submissionFile]);
 
   const submit = async (data: submissionData) => {
-
     try {
       setLoading(true);
       setError(null);
@@ -144,20 +153,7 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
     }
   };
 
-
- 
-
-  if (!practiceEntry) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Practice not found</p>
-      </div>
-    );
-  }
-
-
-
-  return (
+  return !loading?(
     <div className="min-h-screen bg-[#F2F4F7] py-8 dark:bg-gray-900 dark:text-gray-200">
 
       <div className="container mx-auto px-4 max-w-6xl">
@@ -187,7 +183,7 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className={`grid grid-cols-1  lg:grid-cols-3 gap-6`}>
           {/* Left Column - Practice Materials */}
           <div className="lg:col-span-2 space-y-6">
             {/* Tabs */}
@@ -249,12 +245,12 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
                   <div>
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 dark:text-[#F2F4F7]">Reference Image</h3>
                     <div className="relative aspect-video bg-gray-200 rounded-lg overflow-hidden">
-                      <Image
-                        src={practiceEntry?.practice?.image}
+                      {practiceEntry?.practice?.image && (<Image
+                        src={practiceEntry?.practice?.image }
                         alt="Practice reference"
                         fill
                         className="object-contain"
-                      />
+                      />)}
                     </div>
                   </div>
                 )}
@@ -277,7 +273,7 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
             {/* Practice Solutions  */}
             <div className="bg-[#F2F4F7] rounded-lg shadow-md p-6 dark:bg-gray-800 w-full">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 dark:text-[#F2F4F7]">Submission</h3>
-              <div className="p-4 rounded-lg text-center">
+            { !solutionLoading && ( <div className="p-4 rounded-lg text-center">
                 {practiceSolutions && practiceSolutions.length > 0 ? (
   <div className="space-y-6">
     {/* Tabs for each submission */}
@@ -328,13 +324,13 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
     </p>
   </div>
 )}
-              </div>
+              </div>)}
             </div>
           </div>
 
           {/* Right Column - Submission Form */}
                 {
-                  userData?.role === 'Student' && !loading && !error? (<div className="space-y-6">
+                  userData?.role === 'Student' && !error ? (<div className="space-y-6">
                   <div className="bg-[#F2F4F7] rounded-lg shadow-md p-6 dark:bg-gray-800">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 dark:text-[#F2F4F7]">Submit Your Practice</h3>
 
@@ -430,12 +426,7 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
                       </div>
                     </div>
                   </div>
-                </div>):!error?(
-                  <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                  <span className="ml-2 text-gray-600 dark:text-gray-300">Loading...</span>
-                </div>
-                ):(
+                </div>):userData.role === 'student' && error && (
                   <div className="flex items-center justify-center">
                   <span className="ml-2 text-red-600 dark:text-red-400">{error}</span>
                 </div>
@@ -444,7 +435,9 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
               </div>
             </div>
           </div>
-          );
+          ):(
+            <Loading message="Uploading Proof..." />
+          )
 };
 
           export default PracticePage;

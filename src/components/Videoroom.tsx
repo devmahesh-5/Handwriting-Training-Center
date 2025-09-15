@@ -245,9 +245,9 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
   };
 
   return (
-    <div className="p-4">
-      <div className="mb-4">
-        <div className="font-bold mb-1">You</div>
+    <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center cursor-pointer">
+        <div className="font-bold mb-1 text-lg text-gray-800 dark:text-gray-200">{userData.fullName}</div>
         <video
           ref={localVideoRef}
           autoPlay

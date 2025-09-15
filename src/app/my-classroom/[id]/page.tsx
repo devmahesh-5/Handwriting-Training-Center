@@ -1,15 +1,13 @@
 'use client'
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
-import Header from '@/components/Header';
 import { MdCall, MdMessage } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import PracticeEntryCard from '@/components/PracticeEntryCard';
-
+import Loading from '@/components/Loading';
 
 
 const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -71,7 +69,6 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     return !loading ? (
         <div className="px-4 md:px-8 lg:px-12 py-8 min-h-screen bg-gray-50 dark:bg-gray-900">
-            <Header />
             <div className="max-w-7xl mx-auto flex justify-between items-center mb-8">
                 <div className="text-2xl font-bold text-gray-900 dark:text-white flex items-center hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg px-4 py-2 cursor-pointer">
                     {
@@ -161,7 +158,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                             <p className="text-gray-600 dark:text-gray-300 mt-1">
                                 {classroom?.practiceSet?.description}
                             </p>
-                        </div>?
+                        </div>
 
                         {classroom?.practiceSet?.practiceEntries?.map((entry: PracticeEntry) => (
                             <PracticeEntryCard
@@ -259,13 +256,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
             </div>
         </div>
     ) : (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="text-center">
-                <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mx-auto mb-4"></div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Loading Classroom...</h2>
-                <p className="text-gray-600 dark:text-gray-300">Please wait while we fetch the classroom data for you.</p>
-            </div>
-        </div>
+        <Loading />
     );
 
 };

@@ -5,6 +5,8 @@ import { NextRequest,NextResponse } from 'next/server'
 import getDataFromToken from '@/helpers/checkAuth';
 import User from '@/models/users.models';
 import Subscription from '@/models/subscription.models';
+import uploadOnCloudinary from '@/helpers/cloudinary';
+import { saveBuffer } from '@/utils/saveBuffer';
 
 connectDB();
 
@@ -12,14 +14,13 @@ connectDB();
 export const POST = async(req:NextRequest,{params}:{params: Promise<{courseId:string}> })=>{
     try {
         const {courseId} = await params;
-        
+
         if(!isValidObjectId(courseId)){
             throw new ApiError(400,"Invalid course id")
         }
 
         const {_id:userId} = await getDataFromToken(req);
 
-        //first book then redirect to payment page(qr payment) after that do create payment model and add payment id to the subscription with student id
 
         if(!isValidObjectId(userId)){
             throw new ApiError(404,"user not found");
@@ -27,18 +28,44 @@ export const POST = async(req:NextRequest,{params}:{params: Promise<{courseId:st
 
         const user = await User.findById(userId);
 
-        if(user.isVerified ===false){
-            throw new ApiError(401,"User not Verified");
-        }
+        //check it later
+
+        // if(user.isVerified ===false){
+        //     throw new ApiError(401,"User not Verified");
+        // }
 
         if(user.role != 'Student' ){
             throw new ApiError(401,"only student can subscribe to the plan")
         }
 
+        const formData = await req.formData();
+
+        if (!formData) {
+            throw new ApiError(400, "Submission data is required");
+        }
+
+        const paymentProof = formData.get("paymentProof") as File;
+
+        if (!paymentProof) {
+            throw new ApiError(400, "Submission file is required");
+        }
+
+        const tempFilePath = await saveBuffer(paymentProof);
+
+        if (!tempFilePath) {
+            throw new ApiError(500, "Error saving submission file");
+        }
+        const uploadedpaymentProof = await uploadOnCloudinary(tempFilePath);
+
+        if (!uploadedpaymentProof) {
+            throw new ApiError(500, "Error uploading submission file");
+        }
+
         const subscription = await Subscription.create({
             student: user._id,
             course:courseId,
-        })//payment id and the classroom will be assigned later.
+            paymentProof:uploadedpaymentProof.secure_url
+        })
 
         if(!subscription){
             throw new ApiError(500,"something ")

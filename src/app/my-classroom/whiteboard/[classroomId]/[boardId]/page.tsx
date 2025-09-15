@@ -129,7 +129,7 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
         socketRef.current = socket;
 
         socket.on("connect", () => {
-          console.log("Socket connected:", socket.id);
+          //console.log("Socket connected:", socket.id);
           socket.emit("join-board", boardId);
         });
 
@@ -210,19 +210,19 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
   const Router = useRouter();
 
   return (
-    <div style={{ padding: 12 }}>
-      <header style={{ display: "flex", gap: 12, marginBottom: 8 }}>
+    <div style={{ padding: 12 }} className="flex flex-col items-center bg-white dark:bg-gray-900" >
+      <header style={{ display: "flex", gap: 12, marginBottom: 8 }} className="text-gray-900 dark:text-white">
         <div>
           Board id: <strong>{boardId?.slice(0, 8) ?? "—"}</strong>
         </div>
         {userData?.role === "Teacher" && (
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <div className="flex gap-4">
             <label>
-              Color
+              Color:
               <input type="color" value={color} onChange={(e) => setColor(e.target.value)} style={{ marginLeft: 6 }} />
             </label>
             <label>
-              Thickness
+              Thickness:
               <input type="range" min={1} max={30} value={thickness} onChange={(e) => setThickness(Number(e.target.value))} />
             </label>
             <button
@@ -261,7 +261,7 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
       <div className="flex-1 border border-gray-300">
         <canvas
           ref={canvasRef}
-          className="w-full h-full"
+          className=""
           style={{ touchAction: "none", display: "block", background: "white" }}
           onMouseDown={handlePointerDown}
           onMouseMove={handlePointerMove}
@@ -272,7 +272,7 @@ export default function BoardPage({ params }: { params: Promise<{ classroomId: s
           onTouchEnd={handlePointerUp}
         />
       </div>
-      <div className="w-1/4 p-2 overflow-y-auto bg-white">
+      <div className="w-1/4 p-2 overflow-y-auto bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
         <VideoRoom roomId={boardId} />
       </div>
 

@@ -29,9 +29,30 @@ const courseSchema = new mongoose.Schema({
     practiceSet: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'PracticeSet',
-    }
+    },
+    tags: {
+        type: [String],
+        required: true,
+        default : [],
+    },
 
 }, { timestamps: true });
+
+courseSchema.index({
+    name: 'text',
+    description: 'text',
+    type: 'text',
+    tags: 'text',
+
+},
+{
+    weights: {
+        name: 5,
+        description: 2,
+        type: 2,
+        tags: 3,
+    }
+})
 
 const Course = mongoose.models.Course || mongoose.model('Course', courseSchema);
 export default Course

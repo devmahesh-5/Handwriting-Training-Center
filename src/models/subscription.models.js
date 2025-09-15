@@ -10,14 +10,14 @@ const subscriptionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Classroom',
     },
-    payment: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Payment',
+    paymentProof:{
+        type: String,
+        required: true
     },
     status: {
         type: String,
-        enum: ['pending', 'subscribed', 'failed'],
-        default: 'pending',
+        enum: ['Pending', 'Subscribed', 'Failed'],
+        default: 'Pending',
         required: true,
     },
     course:{

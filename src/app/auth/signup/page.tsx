@@ -9,6 +9,8 @@ import { useForm } from 'react-hook-form';
 import { generateUsername } from 'unique-username-generator';
 import Input from '@/components/Input';
 import Select from '@/components/Select';
+import Loading from '@/components/Loading';
+
 
 type SignupFormFields = {
   fullName: string;
@@ -294,12 +296,6 @@ export default function SignupPage() {
       </div>
     </div>
   ) : (
-    <div className="w-full min-h-screen flex items-center justify-center">
-      <div className="animate-spin ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12">
-        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-      </div>
-    </div>
+    <Loading />
   );
 }

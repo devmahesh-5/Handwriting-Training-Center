@@ -52,7 +52,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const id = (await params).id;
-        console.log(id);
+        
         const user = await getDataFromToken(req);
         if (!user) {
             throw new Error("User Session expired or not logged in");
@@ -72,37 +72,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                         _id: new mongoose.Types.ObjectId(id)
                     }
                 },
-
-                {
-                    $lookup: {
-                        from: "users",
-                        localField: "teacher",
-                        foreignField: "_id",
-                        as: "teacher",
-                        pipeline: [
-                            {
-                                $project: {
-                                    _id: 1,
-                                    name: 1,
-                                    email: 1
-                                }
-                            }
-                        ]
-                    }
-                },
                 {
                     $lookup: {
                         from: "practicesets",
                         localField: "practiceSet",
                         foreignField: "_id",
                         as: "practiceset"
-                    }
-                },
-                {
-                    $addFields: {
-                        teacher: {
-                            $first: "$teacher"
-                        }
                     }
                 }
 

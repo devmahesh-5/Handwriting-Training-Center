@@ -18,7 +18,7 @@ function PracticeEntryCard(props: Props) {
     const {classroomId,_id, status, day, practice } = props;
 
     return (
-        <Link href={status == 'locked' ? `/practices/${classroomId}/${_id}` : '#'} key={_id} passHref>
+        <Link href={`/practices/${classroomId}/${_id}`} key={_id} passHref>
                             <div
                                 key={_id}
                                 className={`p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${status === 'locked' ? 'opacity-70' : ''
@@ -54,13 +54,15 @@ function PracticeEntryCard(props: Props) {
                                     </div>
                                     <div>
                                         <button
-                                            className={`px-4 py-2 rounded-md text-sm font-medium ${status === 'locked'
-                                                ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                                                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                                                }`}
-                                            disabled={status === 'locked'}
+                                            // className={`px-4 py-2 rounded-md text-sm font-medium ${status === 'locked'
+                                            //     ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed':
+                                            //     'bg-indigo-600 hover:bg-indigo-700 text-white'
+                                            //     }`}
+                                            // disabled={status === 'locked'}
+                                            className="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white"
                                         >
-                                            {status === 'locked' ? 'Locked' : 'Solve Now'}
+                                            {/* {status === 'locked' ? 'Locked' : 'Solve Now'} */}
+                                            Solve Now
                                         </button>
                                     </div>
                                 </div>

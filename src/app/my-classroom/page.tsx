@@ -1,11 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react'
-import Header from "@/components/Header";
-import { useSelector, useDispatch } from 'react-redux';
 import ClassroomCard from '@/components/ClassroomCard';
-import ProfileCard from '@/components/ProfileCard';
 import axios, { AxiosError } from 'axios';
-import { ApiError } from '@/utils/ApiError';
+import Loading from '@/components/Loading';
 
 interface Classroom {
   _id?: string;
@@ -56,9 +53,9 @@ const MyClassrooms = () => {
     )();
     },[]);
 
-    return (
+    return !loading?(
         <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-            <Header />
+            
             <main className="max-w-7xl mx-auto px-4 py-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {classrooms?.map((classroom: Classroom) => (
@@ -78,6 +75,8 @@ const MyClassrooms = () => {
                 </div>
             </main>
         </div>
+    ):(
+        <Loading />
     )
 
 

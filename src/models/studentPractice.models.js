@@ -14,8 +14,8 @@ const studentSolutionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending", "checked",'redo'],
-    default: "pending",
+    enum: ["Pending", "Checked"],
+    default: "Pending",
   },
   submissionFile: {
     type: String

@@ -45,7 +45,7 @@ interface Course {
     description: string,
     type: string,
     price: number,
-    duration: number,
+    duration: string,
     thumbnail: string,
     practiceSet: string[],
     createdAt: date,
