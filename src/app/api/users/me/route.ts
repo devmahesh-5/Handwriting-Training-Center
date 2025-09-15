@@ -26,12 +26,16 @@ export async function GET(request: NextRequest) {
 
     } catch (error: unknown) {
         console.error("Error getting user ID from token:", error);
-        return NextResponse.
+        const response = NextResponse.
             json({
                 message: error instanceof ApiError ? error.message : "Error getting user ID from token"
             }, {
                 status: error instanceof ApiError ? error.statusCode : 500
             });
+        
+        response.cookies.delete("accessToken");
+        response.cookies.delete("refreshToken");
+        return response;
     }
 
 }

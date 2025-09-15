@@ -38,7 +38,8 @@ export default function LoginPage() {
       const userData = await axios.get('/api/users/me');
       if(userData){
         dispatch(login(userData.data.user));
-
+      }else{
+        dispatch(logout());
       }
       router.push('/home');
 

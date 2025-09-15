@@ -60,7 +60,7 @@ export default function VideoRoom({ roomId, userId }: { roomId: string; userId?:
   const interval = setInterval(() => {
     fetch("https://signaling-server-for-ht-center.onrender.com/ping")
       .catch(() => console.warn("Server might be asleep"));
-  }, 5 * 60 * 1000); // every 5 minutes
+  }, 3 * 60 * 1000);
 
   return () => clearInterval(interval);
 }, []);

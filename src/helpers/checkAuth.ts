@@ -26,6 +26,7 @@ export default async function getDataFromToken(request: NextRequest) {
         const user = await User.findById(decodedToken.id).select("-password -__v");
         
         if (!user) {
+            //clear cookies
             throw new ApiError(404, "User not found");
         }
 

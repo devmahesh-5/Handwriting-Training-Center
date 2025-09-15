@@ -28,10 +28,10 @@ export default function Header() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
+                setError(null);
                 setLoading(true);
                 const user = await axios.get('/api/users/me');
                 dispatch(login(user.data.user));
-
             } catch (error: unknown) {
                 dispatch(logout());
                 error instanceof AxiosError ? setError(error.response?.data?.message) : setError("Something went wrong");
@@ -52,6 +52,7 @@ export default function Header() {
             </div>
         );
     }
+
 
     return authStatus ? (
         <header className={`bg-[#F2F4F7] dark:bg-gray-900 dark:text-[#F2F4F7] sticky top-0 z-50 px-4`}>
