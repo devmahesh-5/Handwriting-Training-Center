@@ -296,6 +296,6 @@ export default function SignupPage() {
       </div>
     </div>
   ) : (
-    <Loading />
+    <Loading message={"Creating Account Please Wait ..."} />
   );
 }

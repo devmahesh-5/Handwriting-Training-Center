@@ -256,7 +256,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
             </div>
         </div>
     ) : (
-        <Loading />
+        <Loading message="Loading classroom..." />
     );
 
 };

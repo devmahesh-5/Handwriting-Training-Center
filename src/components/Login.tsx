@@ -208,7 +208,7 @@ export default function LoginPage() {
         {/* Sign up link */}
         <div className="mt-5 pt-5 border-t border-gray-200 dark:border-gray-700">
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link
               href="/auth/signup"
               className="font-medium text-indigo-600 hover:text-indigo-500"
@@ -220,6 +220,6 @@ export default function LoginPage() {
       </div>
     </div>
   ) :(
-    <Loading />
+    <Loading message={'Logging in ...'}/>
   )
 }

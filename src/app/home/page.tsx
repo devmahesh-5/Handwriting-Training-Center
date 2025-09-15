@@ -188,7 +188,7 @@ function DashboardPage() {
 
     </main>
   ) : (
-    <Loading />
+    <Loading message={"Loading Dashboard ..."}/>
   )
 }
 

@@ -436,7 +436,7 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
             </div>
           </div>
           ):(
-            <Loading message="Uploading Proof..." />
+            <Loading message="Loading..." />
           )
 };
 

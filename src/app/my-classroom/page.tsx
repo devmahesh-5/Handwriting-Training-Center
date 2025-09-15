@@ -76,7 +76,7 @@ const MyClassrooms = () => {
             </main>
         </div>
     ):(
-        <Loading />
+        <Loading message={"Fetching classrooms"} />
     )
 
 
