@@ -115,3 +115,12 @@ interface PracticeSolution {
     updatedAt: date,
     __v: number
 }
+
+interface Subscription {
+    _id: string,
+    student: User,
+    classroom?: Classroom | null,
+    paymentProof: string,
+    status: string,
+    course: Course
+}

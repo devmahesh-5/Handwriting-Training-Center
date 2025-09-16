@@ -6,6 +6,7 @@ import connectDB from '@/db/index'
 import { NextRequest, NextResponse } from 'next/server'
 import getDataFromToken from '@/helpers/checkAuth';
 import Subscription from '@/models/subscription.models';
+import User from '@/models/users.models';
 
 connectDB();
 
@@ -15,6 +16,16 @@ export async function GET(req: NextRequest) {
 
         if (!isValidObjectId(userId)) {
             throw new ApiError(404, "user not found");
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            throw new ApiError(404, "user not found");
+        }
+
+        if (user.role !== "Student") {
+            throw new ApiError(403, "unauthorized access");
         }
 
         const subscriptions = await Subscription.aggregate([
@@ -30,22 +41,27 @@ export async function GET(req: NextRequest) {
                 }
             },
             {
-                $lookup: {
-                    from: "payments",
-                    localField: "payment",
+                $lookup:{
+                    from: "users",
+                    localField: "student",
                     foreignField: "_id",
-                    as: "payment"
+                    as: "student"
                 }
             },
             {
-                $addFields: { course: { $arrayElemAt: ["$course", 0] } }
+                $addFields: { 
+                    course: { $arrayElemAt: ["$course", 0] } ,
+                    student: { $arrayElemAt: ["$student", 0] }
+                }
+
             },
             {
                 $project: {
                     course: 1,
                     createdAt: 1,
                     status: 1,
-                    payment: 1
+                    paymentProof: 1,
+                    student: 1
                 }
             }
         ])

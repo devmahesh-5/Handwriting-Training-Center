@@ -22,7 +22,7 @@ export default function Header() {
         { name: 'Home', slug: '/home', active: authStatus },
         { name: 'Courses', slug: '/courses', active: authStatus },
         { name: 'About', slug: '/', active: authStatus },
-        { name: 'Subscription', slug: '/my-subscription', active: authStatus },
+        { name: 'Subscription', slug: '/my-subscriptions', active: authStatus },
     ];
 
     useEffect(() => {

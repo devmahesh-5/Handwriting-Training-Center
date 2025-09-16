@@ -39,7 +39,6 @@ function ClassroomCard(props: Props) {
      const progressPercentage = Math.min(Math.round((currentXp / xp) * 100), 100);
    
     const router = useRouter();
-    console.log({props});
   return (
     
     <div 
