@@ -1,8 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link';
-import Input from '@/components/Input';
-import { MdArrowDropDownCircle, MdNotifications, MdOutlineArrowUpward } from 'react-icons/md';
+import {MdNotifications} from 'react-icons/md';
 import Image from 'next/image';
 import Logo from '@/components/LOGO';
 import LogoutBtn from './logoutBtn';
@@ -21,7 +20,7 @@ export default function Header() {
     const navItems = [
         { name: 'Home', slug: '/home', active: authStatus },
         { name: 'Courses', slug: '/courses', active: authStatus },
-        { name: 'About', slug: '/', active: authStatus },
+        { name: 'About', slug: '/about', active: authStatus },
         { name: 'Subscription', slug: '/my-subscriptions', active: authStatus },
     ];
 
@@ -55,8 +54,8 @@ export default function Header() {
 
 
     return authStatus ? (
-        <header className={`bg-[#F2F4F7] dark:bg-gray-900 dark:text-[#F2F4F7] sticky top-0 z-50 px-4`}>
-            <nav className='flex flex-row justify-between items-center mx-auto px-2 py-3 w-full md:w-11/12 md:py-4'>
+        <header className={`bg-[#F2F4F7] dark:bg-gray-800 dark:text-[#F2F4F7] sticky top-0 z-50 px-4`}>
+            <nav className='flex flex-row justify-between items-center mx-auto px-2 py-2 w-full md:w-11/12 md:py-2'>
                 {/* Logo */}
                 <div className='flex flex-row items-center'>
                     <Image
@@ -106,7 +105,7 @@ export default function Header() {
 
                 {/* Mobile Menu Dropdown */}
 
-                <div className='fixed bottom-2 md:hidden bg-gray-300 dark:bg-gray-500 dark:text-[#F2F4F7] rounded-lg shadow-xl z-50 left-1/2 transform -translate-x-1/2'>
+                <div className='fixed bottom-2 md:hidden bg-gray-300 dark:bg-gray-600 dark:text-[#F2F4F7] rounded-lg shadow-xl z-50 left-1/2 transform -translate-x-1/2'>
                     <div className='flex flex-row'>
                         {navItems.map((item, index) => (
                             <div key={index} className={`px-4 py-2 hover:bg-gray-400 dark:hover:bg-gray-400 rounded-full cursor-pointer ${item.slug === pathname ? 'bg-gray-400 dark:bg-gray-400' : ''}`}>

@@ -8,19 +8,20 @@ interface Props {
     thumbnail: string;
     xp?: number; 
     duration?: string;
+    isNew?: boolean 
 }
 
 function CourseCard(props: Props) {
-    const { title, description, thumbnail, xp, duration } = props;
+    const { title, description, thumbnail, xp, duration, isNew } = props;
     const router = useRouter();
     return (
         <div className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-700 cursor-pointer h-56 hover:-translate-y-0.5 hover:shadow-lg ">
             {/* Thumbnail */}
            
             <div className="relative h-24 w-full">
-                 <span className="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full z-10">
+                { isNew &&(<span className="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full z-10">
                 New Course
-                </span>
+                </span>)}
                 <img
                     src={thumbnail} 
                     alt={title}

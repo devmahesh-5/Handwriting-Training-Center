@@ -132,7 +132,7 @@ function DashboardPage() {
 
   //remember to add course to classroom
   return !loading ? (
-    <main className="min-h-screen dark:bg-gray-900 bg-[#F2F4F7] loading-lazy">
+    <main className="min-h-screen dark:bg-gray-800 bg-[#F2F4F7] loading-lazy">
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto w-full px-4 py-3 sm:w-11/12'>
         <ClassroomCard
           id={userClassrooms?._id}
@@ -151,7 +151,9 @@ function DashboardPage() {
           title={userCourses?.name || "N/A"}
           duration={userCourses?.duration}
           description={userCourses?.description || "N/A"}
-          thumbnail={userCourses?.thumbnail || '/course.png'} />
+          thumbnail={userCourses?.thumbnail || '/course.png'} 
+          isNew = {true}
+          />
 
         <ProfileCard
 

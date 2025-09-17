@@ -68,7 +68,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
 
     return !loading ? (
-        <div className="px-4 md:px-8 lg:px-12 py-8 min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="px-4 md:px-8 lg:px-12 py-8 min-h-screen bg-gray-50 dark:bg-gray-800">
             <div className="max-w-7xl mx-auto flex justify-between items-center mb-8">
                 <div className="text-2xl font-bold text-gray-900 dark:text-white flex items-center hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg px-4 py-2 cursor-pointer">
                     {

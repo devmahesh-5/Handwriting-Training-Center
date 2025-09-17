@@ -1,12 +1,9 @@
 // app/page.tsx
 'use client'
 
-import React, { useState, useEffect } from "react";
-import {useDispatch, useSelector} from 'react-redux';
-
-import {login, logout} from '@/store/authSlice';
+import React from "react";
+import {useSelector} from 'react-redux';
 import Link from 'next/link'
-import Logo from "@/components/LOGO";
 
 
 export default function LandingPage() {

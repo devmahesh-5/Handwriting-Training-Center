@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
             type: string;
             price: string;
             duration: string;
+            tags ?: string;
         };
 
 
@@ -34,9 +35,9 @@ export async function POST(req: NextRequest) {
             throw new ApiError(401, "User is not verified");
         }
 
-        const { name, description, type, price, duration } = body;
+        const { name, description, type, price, duration, tags } = body;
 
-        if ([name, description, type, price, duration].some(field => !field || field === undefined)) {
+        if ([name, description, type, price, duration, tags].some(field => !field || field === undefined)) {
             throw new ApiError(400, "All fields are required");
         }
 
@@ -54,7 +55,8 @@ export async function POST(req: NextRequest) {
             type,
             price,
             duration,
-            thumbnail: uploadedFile.secure_url
+            thumbnail: uploadedFile.secure_url,
+            tags,
         });
 
         if (!course) {
