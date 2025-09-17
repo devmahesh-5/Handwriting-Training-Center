@@ -39,7 +39,20 @@ const MySubscription = () => {
 
     },[]);
 
-    console.log("subscriptions", subscriptions)
+    if(!subscriptions){  return ( 
+        <div className="flex flex-col items-center justify-center bg-gray-100 p-4 dark:bg-gray-800 min-h-screen w-full">
+                <div className="flex flex-col items-center justify-center h-full w-full">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">No Subscriptions Found</h2>
+                    <p className="text-gray-600 dark:text-gray-300">You don&apos;t have any subscriptions yet.</p>
+                    <button
+                    onClick={() => router.push('/courses')} 
+                    className="mt-4 px-4 py-2 bg-[#082845] text-white rounded-md hover:bg-[#6C48E3]">Explore Courses</button>
+                       
+            </div>
+        </div>
+    )
+    }
+
 
     return !loading && !error ? (
         <div className="flex flex-col gap-4 bg-gray-100 p-4 dark:bg-gray-800 min-h-screen w-full">

@@ -6,8 +6,9 @@ import axios, { AxiosError } from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import Loading from '@/components/Loading';
-import Input from '@/components/Input';
+import { useSelector } from 'react-redux';
 import { useForm, useWatch } from 'react-hook-form';
+import {useRouter} from 'next/navigation';
 
 interface submissionData {
   paymentProof?: FileList | null;
@@ -37,7 +38,7 @@ export default function CourseDetailPage() {
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm<submissionData>({ mode: 'onBlur' });
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const paymentProof = useWatch({ control, name: 'paymentProof' });
-
+  const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
   const params = useParams();
   const courseId = params.id as string;
 
@@ -47,6 +48,10 @@ export default function CourseDetailPage() {
   const [paymentLoading, setPaymentLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [openPayment, setOpenPayment] = useState(false);
+  const [practiceSets, setPracticeSets] = useState<PracticeSet[] | null>(null);
+  const [loadingPracticeset, setLoadingPracticeset] = useState<boolean>(false);
+  const [errorPracticeset, setErrorPracticeset] = useState<string | null>(null);
+  const [isPracticeSetActive, setIsPracticeSetActive] = useState(false);
 
   useEffect(() => {
     // Create preview when file is selected
@@ -111,6 +116,40 @@ export default function CourseDetailPage() {
 
   }
 
+  const getPracticeSet =async()=>{
+    try {
+      setLoadingPracticeset(true);
+      setError(null);
+      setIsPracticeSetActive(true);
+      const practiceSets = await axios.get(`/api/practice-set`);
+      setPracticeSets(practiceSets.data.practiceSets);
+      
+    } catch (error: unknown) {
+      setErrorPracticeset(error instanceof AxiosError ? error.response?.data?.message : "something went wrong While adding practice set.");
+    } finally {
+      setLoadingPracticeset(false);
+      
+    }
+
+  }
+
+  const addPracticeSet = async(practiceSetId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.patch(`/api/courses/${courseId}/${practiceSetId}`);
+      setIsPracticeSetActive(false);
+    } catch (error: unknown) {
+      console.error("Signup error:", error);
+      setError(error instanceof AxiosError ? error.response?.data?.message : "Upload failed. Please try again.");
+    } finally {
+      setLoading(false);
+      
+    }
+  }
+
+  const router = useRouter();
+
   if (loading) {
     return (
       <Loading message="Loading course details..." />
@@ -119,7 +158,7 @@ export default function CourseDetailPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-800">
         <div className="text-center">
           <div className="text-red-600 mb-4">{error}</div>
           <Link href="/courses" className="text-blue-600 hover:underline dark:text-white">
@@ -132,7 +171,7 @@ export default function CourseDetailPage() {
 
   if (!course) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-800">
         <div className="text-center">
           <div className="text-gray-600 mb-4 dark:text-gray-300">Course not found</div>
           <Link href="/courses" className="text-blue-600 hover:underline dark:text-white">
@@ -144,8 +183,8 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 dark:bg-gray-900">
-      <div className="max-w-5xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 py-8 dark:bg-gray-800">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="mb-6">
           <Link href="/courses" className="text-blue-600 hover:underline">
@@ -190,11 +229,17 @@ export default function CourseDetailPage() {
               </span>
             </div>
 
-            <button
+            {userData.role === "student" ?(<button
               onClick={() => setOpenPayment(prev => !prev)}
               className="bg-[#6C48E3] hover:bg-gray-700 text-white px-6 py-2 rounded-md font-medium transition-colors cursor-pointer">
               Enroll Now
+            </button>):userData.role === 'Admin' &&(
+              <button
+              onClick={()=>router.push(`/courses/${courseId}/edit`)}
+              className="bg-[#6C48E3] hover:bg-gray-700 text-white px-6 py-2 rounded-md font-medium transition-colors cursor-pointer">
+              Edit
             </button>
+            )}
 
             {
               (openPayment && !success) ? (
@@ -284,7 +329,62 @@ export default function CourseDetailPage() {
 
         {/* Practice Sets Section */}
         <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800">
+          <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 dark:text-white">Practice Sets</h2>
+          <button
+              onClick={getPracticeSet}
+              className="bg-[#6C48E3] hover:bg-gray-700 text-white px-6 py-2 rounded-md font-medium transition-colors cursor-pointer">
+              Add Practice Set
+            </button>
+            </div>
+
+            {isPracticeSetActive &&(
+              loadingPracticeset? (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-300">
+                  <p>Loading practice sets...</p>
+                </div>
+              ):errorPracticeset?(
+                <div className="text-center py-8 text-gray-500 dark:text-gray-300">
+                  <p className='text-red-500'>{errorPracticeset}</p>
+                </div>
+              ):(
+                Array.isArray(practiceSets) && practiceSets.length > 0 ? (
+                  practiceSets.map((practiceSet) => (
+                    <div
+                      key={practiceSet._id}
+                      className="flex border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex-grow">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2 dark:text-white">
+                        {practiceSet.title}
+                      </h3>
+                      <p className="text-gray-600 mb-3 dark:text-gray-300">{practiceSet.description}</p>
+
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          {practiceSet.practiceEntry.length} practice entries
+                        </span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <button
+                          onClick={() => addPracticeSet(practiceSet._id)}
+                          className="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-500 bg-transparent border border-red-500 hover:border-red-600 dark:border-red-400 dark:hover:border-red-500 px-4 py-2 rounded-md transition-colors cursor-pointer"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-300">
+                    <p>No practice sets available for this course yet.</p>
+                  </div>
+                )
+
+              ))
+            }
 
           {course.practiceset.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-300">

@@ -3,13 +3,18 @@
 import React, { useEffect, useState } from 'react'
 import CourseCard from "@/components/CourseCard";
 import axios, { AxiosError } from 'axios';
-import { MdSearch } from 'react-icons/md';
+import { MdLaunch, MdSearch } from 'react-icons/md';
+import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 
 const Courses = () => {
     const [query, setQuery] = useState<string>("");
     const [courses, setCourses] = useState<Course[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+
+    const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
 
     const fetchCourses = async (query?: string) => {
         try {
@@ -50,9 +55,10 @@ const Courses = () => {
         }
     };
 
+
     return (
         <div className="bg-gray-100 dark:bg-gray-800">
-            <div className="flex items-center w-full max-w-md py-2 px-4">
+            <div className="flex gap-4 justify-space-between items-center w-full max-w-md py-2 px-4">
                 <div className="flex w-full rounded-full shadow-sm border border-gray-300 overflow-hidden bg-[#F2F4F7] focus-within:ring-2 focus-within:ring-gray-500">
                     <input
                         type="text"
@@ -67,7 +73,15 @@ const Courses = () => {
                     >
                         <MdSearch size={20} />
                     </button>
+
+
                 </div>
+                {userData.role ==='Admin' &&(<button
+                    onClick={() => router.push('/courses/add')}
+                    className="flex items-center justify-center px-4 text-white bg-[#6c44ff] hover:bg-[#6c44ff]/80 transition-colors rounded-full"
+                >
+                    <MdLaunch size={20} />Launch Course
+                </button>)}
             </div>
 
             {!loading && !error ? (

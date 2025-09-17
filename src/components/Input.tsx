@@ -21,7 +21,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <input
           type={type}
-          className={`px-3 py-2 bg-white text-black outline-none focus:bg-gray-50 duration-200 border ${
+          className={`px-3 py-2 bg-[#F2F4F7] dark:bg-gray-600 text-black dark:text-[#F2F4F7] rounded-lg outline-none focus:bg-gray-50 dark:focus:bg-gray-700 duration-200 border ${
             error ? 'border-red-500' : 'border-gray-200'
           } w-full focus:outline-none focus:ring-2 focus:ring-[#6C48E3] ${className}`}
           ref={ref}

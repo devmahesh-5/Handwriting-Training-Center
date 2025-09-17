@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import { MdMore } from 'react-icons/md';
 interface Props {
     _id?: string;
     title: string;
@@ -15,7 +16,7 @@ function CourseCard(props: Props) {
     const { title, description, thumbnail, xp, duration, isNew } = props;
     const router = useRouter();
     return (
-        <div className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-700 cursor-pointer h-56 hover:-translate-y-0.5 hover:shadow-lg ">
+        <div className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 dark:border-gray-700 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg ">
             {/* Thumbnail */}
            
             <div className="relative h-24 w-full">
@@ -49,7 +50,7 @@ function CourseCard(props: Props) {
                 className="mt-4 h-10 bg-[#6C48E3] hover:bg-[#5A3BC9] text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6C48E3] focus:ring-offset-2 cursor-pointer" 
                 onClick={() => router.push(`/courses/${props._id}`)}
                 >
-                    Enroll Now
+                    More
                 </button>
                 </div>
 

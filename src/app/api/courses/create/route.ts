@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
             throw new ApiError(401, "User Session expired or not logged in");
         }
 
-        if (user.isVerified === false) {
-            throw new ApiError(401, "User is not verified");
+        if (user.isVerified === false || user.role !== "Admin") {
+            throw new ApiError(401, "User is not Authorized to create course");
         }
 
         const { name, description, type, price, duration, tags } = body;

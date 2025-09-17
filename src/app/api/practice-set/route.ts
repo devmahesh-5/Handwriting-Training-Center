@@ -56,4 +56,25 @@ export async function POST(req: NextRequest) {
 
 }
 
+export async function GET(req: NextRequest) {
+    try {
+        const { _id } = await getDataFromToken(req);
+
+        if (!isValidObjectId(_id)) {
+            throw new ApiError(404, "user not Authenticated")
+        }
+        
+        const practiceSets = await PracticeSet.find({});
+
+        if(!practiceSets){
+            throw new ApiError(404, "No practice sets found");
+        }
+
+        return NextResponse.json({ message: "Practice sets found successfully", practiceSets }, { status: 200 });
+    } catch (error: unknown) {
+        console.error("Error getting practice sets:", error);
+        return NextResponse.json({ message: error instanceof ApiError ? error.message : "Error getting practice sets" }, { status: error instanceof ApiError ? error.statusCode : 500 });
+    }
+}
+
 

@@ -44,6 +44,7 @@ interface Course {
     name: string,
     description: string,
     type: string,
+    tags?: string[] | null,
     price: number,
     duration: string,
     thumbnail: string,

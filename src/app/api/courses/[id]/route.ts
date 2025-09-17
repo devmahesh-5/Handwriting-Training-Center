@@ -5,6 +5,8 @@ import getDataFromToken from "@/helpers/checkAuth";
 import { ApiError } from "@/utils/ApiError";
 import User from "@/models/users.models";
 import mongoose,{isValidObjectId} from "mongoose";
+import { saveBuffer } from "@/utils/saveBuffer";
+import uploadOnCloudinary from "@/helpers/cloudinary";
 
 connectDB();
 
@@ -119,21 +121,56 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
             throw new ApiError(401, "User Session expired or not logged in");
         }
-        if (user.isVerified === false) {
+        if (user.isVerified === false || user.role !== "Admin") {
             throw new ApiError(401, "User is not verified");
         }
 
         const id =(await params).id;
-        const body = await req.json();
+
+        const formData = await req.formData();
+
+        const courseImage = formData.get('thumbnail') as File;
+        
+        const body = Object.fromEntries(formData) as {
+            name: string;
+            description: string;
+            type: string;
+            price: string;
+            duration: string;
+            tags ?: string;
+        };
+
         const { name, description, type, price, duration } = body;
+        
         [name, description, type, price, duration].some(field => !field || field === undefined) && NextResponse.json({ message: "All fields are required" }, { status: 400 });
 
+        
+
+        
+
+        const existingCourse = await Courses.findById(id);
+
+        if (!existingCourse) {
+            throw new ApiError(404, "Course not found");
+        }
+
+        let thumbnail = existingCourse.thumbnail;
+
+        if(courseImage) {
+            const localFile = await saveBuffer(courseImage);
+            const uploadedFile = await uploadOnCloudinary(localFile);
+            if(uploadedFile){
+                thumbnail = uploadedFile?.secure_url;
+            }
+        }
+        
         const course = await Courses.findByIdAndUpdate(id, {
             name,
             description,
             type,
             price,
-            duration
+            duration,
+            thumbnail
         }, {
             new: true
         });
