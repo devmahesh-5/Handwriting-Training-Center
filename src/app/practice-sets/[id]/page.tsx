@@ -137,7 +137,7 @@ const PracticeSetPage = ({params}:{params:Promise<{id:string}>}) => {
                             No practice entries yet
                         </h3>
                         <p className="text-gray-500 dark:text-gray-400 mb-4">
-                            This practice set doesn't contain any entries yet.
+                            This practice set doesn&apos;t contain any entries yet.
                         </p>
                     </div>
                 )}
