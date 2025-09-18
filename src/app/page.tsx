@@ -4,9 +4,8 @@
 import React, { useState, useEffect } from "react";
 import {useDispatch, useSelector} from 'react-redux';
 
-import {login, logout} from '@/store/authSlice';
 import Link from 'next/link'
-import Logo from "@/components/LOGO";
+import { userData } from "@/interfaces/interfaces";
 
 
 export default function LandingPage() {
