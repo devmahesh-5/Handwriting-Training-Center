@@ -24,13 +24,13 @@ export async function GET(req: NextRequest) {
             throw new ApiError(404, "user not found");
         }
 
-        if (user.role !== "Admin") {
+        if (user.role !== "Student") {
             throw new ApiError(403, "unauthorized access");
         }
 
         const subscriptions = await Subscription.aggregate([
             {
-                $match: {}
+                $match: { student: userId }
             },
             {
                 $lookup: {
@@ -63,8 +63,8 @@ export async function GET(req: NextRequest) {
                     paymentProof: 1,
                     student: 1,
                     updatedAt: 1,
-                    classroom: 1,
-                    _id: 1
+                    _id: 1,
+                    classroom: 1
                 }
             }
         ])

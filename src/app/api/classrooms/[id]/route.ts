@@ -9,11 +9,11 @@ import { isValidObjectId } from "mongoose";
 connectDB();
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-   
+
     const { id } = await params;
     const user = await getDataFromToken(req);
 
-    if(!isValidObjectId(id)){
+    if (!isValidObjectId(id)) {
 
         throw new ApiError(400, "Invalid Classroom ID");
     }
@@ -57,15 +57,47 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                         from: "courses",
                         localField: "course",
                         foreignField: "_id",
-                        as: "course"
-                    }
-                },
-                {
-                    $lookup: {
-                        from: "payments",
-                        localField: "payment",
-                        foreignField: "_id",
-                        as: "payment"
+                        as: "course",
+                        pipeline: [
+                            {
+                                $lookup: {
+                                    from: "practicesets",
+                                    localField: "practiceSet",
+                                    foreignField: "_id",
+                                    as: "practiceSet",
+                                    pipeline: [
+                                        {
+                                            $lookup: {
+                                                from: "practiceentries",
+                                                localField: "practiceEntry",
+                                                foreignField: "_id",
+                                                as: "practiceEntries",
+                                                pipeline: [
+                                                    {
+                                                        $lookup: {
+                                                            from: "practices",
+                                                            localField: "practice",
+                                                            foreignField: "_id",
+                                                            as: "practice"
+                                                        }
+                                                    },
+                                                    {
+                                                        $addFields: {
+                                                            practice: { $first: "$practice" }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                $addFields: {
+                                    practiceSet: { $first: "$practiceSet" }
+                                }
+                            }
+                        ]
                     }
                 },
                 {
@@ -77,54 +109,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                     }
                 },
                 {
-                    $lookup: {
-                        from: "practicesets",
-                        localField: "practiceSet",
-                        foreignField: "_id",
-                        as: "practiceSet",
-                        pipeline: [
-                            {
-                                $lookup: {
-                                    from: "practiceentries",
-                                    localField: "practiceEntry",
-                                    foreignField: "_id",
-                                    as: "practiceEntries",
-                                    pipeline: [
-                                        {
-                                            $lookup: {
-                                                from: "practices",
-                                                localField: "practice",
-                                                foreignField: "_id",
-                                                as: "practice"
-                                            }
-                                        },
-                                        {
-                                            $addFields: {
-                                                practice: { $first: "$practice" }
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
                     $addFields: {
-                        practiceSet: { $first: "$practiceSet" },
                         course: { $first: "$course" },
                         payment: { $first: "$payment" },
                         subscription: { $first: "$subscription" },
                         teacher: { $first: "$teacher" },
-
-
                     }
                 },
                 {
                     $addFields: {
                         "totalXp": {
                             $reduce: {
-                                input: "$practiceSet.practiceEntries",
+                                input: "$course.practiceSet.practiceEntries",
                                 initialValue: 0,
                                 in: { $add: ["$$value", "$$this.totalMarks"] }
                             }
@@ -162,6 +158,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     } catch (error: unknown) {
 
+        console.error("Error getting classroom:", error);
+
         if (error instanceof ApiError) {
 
             return NextResponse.json({
@@ -170,7 +168,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                 status: error.statusCode
             });
 
-        }else{
+        } else {
 
             return NextResponse.json({
                 message: "Internal Server Error"

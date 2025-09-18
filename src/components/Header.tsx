@@ -24,6 +24,13 @@ export default function Header() {
         { name: 'Subscription', slug: '/my-subscriptions', active: authStatus },
     ];
 
+    const adminNavItems = [
+        { name: 'Dashboard', slug: '/dashboard', active: authStatus },
+        { name: 'Courses', slug: '/courses', active: authStatus },
+        { name: 'Sets', slug: '/practice-sets', active: authStatus },
+        { name: 'Subscription', slug: '/subscriptions', active: authStatus },
+    ];
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -69,13 +76,22 @@ export default function Header() {
                 </div>
 
                 {/* Desktop Navigation */}
-                <div className='hidden md:flex flex-row bg-gray-300 dark:bg-gray-600 dark:text-[#F2F4F7] rounded-full'>
+
+                {userData.role != 'Admin' ? (<div className='hidden md:flex flex-row bg-gray-300 dark:bg-gray-600 dark:text-[#F2F4F7] rounded-full'>
                     {navItems.map((item, index) => (
                         <div key={index} className={`px-4 py-2 hover:bg-gray-400 dark:hover:bg-gray-400 rounded-full cursor-pointer ${item.slug === pathname ? 'bg-gray-400 dark:bg-gray-400' : ''}`}>
                             <Link href={item.slug}>{item.name}</Link>
                         </div>
                     ))}
+                </div>):(
+                    <div className='hidden md:flex flex-row bg-gray-300 dark:bg-gray-600 dark:text-[#F2F4F7] rounded-full'>
+                    {adminNavItems.map((item, index) => (
+                        <div key={index} className={`px-4 py-2 hover:bg-gray-400 dark:hover:bg-gray-400 rounded-full cursor-pointer ${item.slug === pathname ? 'bg-gray-400 dark:bg-gray-400' : ''}`}>
+                            <Link href={item.slug}>{item.name}</Link>
+                        </div>
+                    ))}
                 </div>
+                )}
 
                 {/* Desktop Classroom Button */}
                 <div className='hidden md:flex flex-row items-center'>
@@ -103,9 +119,9 @@ export default function Header() {
                     }
                 </div>
 
-                {/* Mobile Menu Dropdown */}
+                {/* Mobile Menu */}
 
-                <div className='fixed bottom-2 md:hidden bg-gray-300 dark:bg-gray-600 dark:text-[#F2F4F7] rounded-lg shadow-xl z-50 left-1/2 transform -translate-x-1/2'>
+                {userData.role != 'Admin' ? (<div className='fixed bottom-2 md:hidden bg-gray-300 dark:bg-gray-600 dark:text-[#F2F4F7] rounded-lg shadow-xl z-50 left-1/2 transform -translate-x-1/2'>
                     <div className='flex flex-row'>
                         {navItems.map((item, index) => (
                             <div key={index} className={`px-4 py-2 hover:bg-gray-400 dark:hover:bg-gray-400 rounded-full cursor-pointer ${item.slug === pathname ? 'bg-gray-400 dark:bg-gray-400' : ''}`}>
@@ -120,7 +136,24 @@ export default function Header() {
                             Classroom
                         </Link>
                     </div>
+                </div>):(
+                    <div className='fixed bottom-2 md:hidden bg-gray-300 dark:bg-gray-600 dark:text-[#F2F4F7] rounded-lg shadow-xl z-50 left-1/2 transform -translate-x-1/2'>
+                    <div className='flex flex-row'>
+                        {adminNavItems.map((item, index) => (
+                            <div key={index} className={`px-4 py-2 hover:bg-gray-400 dark:hover:bg-gray-400 rounded-full cursor-pointer ${item.slug === pathname ? 'bg-gray-400 dark:bg-gray-400' : ''}`}>
+                                <Link href={item.slug}>{item.name}</Link>
+                            </div>
+                        ))}
+
+                        <Link
+                            href="/my-classroom"
+                            className={`px-4 py-2 hover:bg-gray-400 dark:hover:bg-gray-400 rounded-full cursor-pointer`}
+                        >
+                            Classroom
+                        </Link>
+                    </div>
                 </div>
+                )}
 
             </nav>
         </header>

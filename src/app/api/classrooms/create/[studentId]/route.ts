@@ -6,15 +6,18 @@ import Classroom from "@/models/classroom.models";
 import getDataFromToken from "@/helpers/checkAuth";
 import { ApiError } from "@/utils/ApiError";
 import User from "@/models/users.models";
+import Subscription from "@/models/subscription.models";
 
 
 connectDB();
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest,{ params }: { params: Promise<{ studentId: string }> }) {
     try {
         const {name, description} = await req.json();
         const { searchParams } = new URL(req.url);
         const courseId = searchParams.get("courseId");
+        const subscriptionId = searchParams.get("subscriptionId");
+        const studentId = (await params).studentId;
 
         if (!name || !description) {
             throw new ApiError(400, "Name and description are required");
@@ -24,9 +27,18 @@ export async function POST(req: NextRequest) {
         if (!mongoose.isValidObjectId(userId)) {
             throw new ApiError(400, "Invalid user ID");
         }
+
+        if(!mongoose.isValidObjectId(courseId)){
+            throw new ApiError(400,"Invalid course id")
+        }
+
+        if(!mongoose.isValidObjectId(studentId)){
+            throw new ApiError(400,"Invalid student id")
+        }
+
         const user = await User.findById(userId);
 
-        if(user.role !== "admin") {
+        if(user.role !== "Admin") {
             throw new ApiError(403, "Unauthorized access");
         }
 
@@ -38,10 +50,27 @@ export async function POST(req: NextRequest) {
             name,
             description,
             course: courseId,
+            status: "completed",
+            students: [studentId],
+            subscription: subscriptionId
         });
+
+        const updatedSubscription = await Subscription.findByIdAndUpdate(subscriptionId,
+            {
+                $addToSet:{classroom: classroom._id},
+                $set:{status:"Subscribed"},
+            },
+                {
+                    new: true
+                });
+
         
         if(!classroom){
             throw new ApiError(500,"could not create classroom")
+        }
+
+        if(!updatedSubscription){
+            throw new ApiError(500,"could not update subscription");
         }
         
         return NextResponse.json(classroom);
@@ -56,6 +85,6 @@ export async function POST(req: NextRequest) {
         }
         
 
-        return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+        return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
     }
 }

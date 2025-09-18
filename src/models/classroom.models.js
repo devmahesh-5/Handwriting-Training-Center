@@ -37,8 +37,8 @@ const classroomSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'completed', 'active'],
-        default: 'pending',
+        enum: ['Pending', 'Approved', 'Active'],
+        default: 'Pending',
         required: true,
     },
     

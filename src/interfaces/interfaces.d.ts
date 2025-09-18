@@ -1,3 +1,5 @@
+import path from "path";
+
 interface User {
     _id: string,
     fullName: string,
@@ -31,12 +33,23 @@ interface Classroom {
     students: User[];
     status: 'active' | 'inactive' | 'archived';
     teacher: User;
-    practiceSet: PracticeSet;
+    practiceSet?: string | null;
     course?: Course;
     totalXp: number;
     createdAt: Date;
     updatedAt: Date;
     __v: number;
+}
+
+interface PracticeSet {
+    _id: string,
+    title: string,
+    description: string,
+    practiceEntries: PracticeEntry[],
+    practiceEntry: string[],
+    createdAt: Date,
+    updatedAt: Date,
+    __v: number
 }
 
 interface Course {
@@ -48,7 +61,7 @@ interface Course {
     price: number,
     duration: string,
     thumbnail: string,
-    practiceSet: string[],
+    practiceSet: PracticeSet,
     createdAt: date,
     updatedAt: date,
     __v: number
@@ -123,5 +136,8 @@ interface Subscription {
     classroom?: Classroom | null,
     paymentProof: string,
     status: string,
-    course: Course
+    course: Course,
+    createdAt: date,
+    updatedAt: date,
+    __v: number
 }
