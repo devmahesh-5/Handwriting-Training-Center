@@ -8,17 +8,18 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import PracticeEntryCard from '@/components/PracticeEntryCard';
 import Loading from '@/components/Loading';
-
-
-import { Classroom, userData, Course, Practice,PracticeEntry } from '@/interfaces/interfaces';
+import { Classroom, userData, User,PracticeEntry } from '@/interfaces/interfaces';
+import TeacherCard from '@/components/TeacherCard';
 
 const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [classroom, setClassroom] = useState<Classroom | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const Router = useRouter();
+    const [teachers, setTeachers] = useState<User[]>([]);
+    const [isTeacherActive, setIsTeacherActive] = useState(false);
     const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
-
+    const router = useRouter();
     const { id } = React.use(params);
 
     const date = new Date().getHours();
@@ -68,9 +69,28 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     }
 
-    const assignTeacher = async () =>{
-
+    const getTeacher = async () =>{
+        try {
+            setLoading(true);
+            setError(null);
+            setIsTeacherActive(true);
+            const response = await axios.get(`/api/users/teachers`);
+            setTeachers(response.data.teachers);
+            setLoading(false);
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                setError(error.response?.data?.message || 'An error occurred while fetching classroom data.');
+            }
+        } finally {
+            setLoading(false);
+        }
     }
+
+    const handleTeacherActive = ()=>{
+        setIsTeacherActive(!isTeacherActive);
+        router.refresh();
+    }
+
 
     return !loading ? (
         <div className="px-4 md:px-8 lg:px-12 py-8 min-h-screen bg-gray-50 dark:bg-gray-800">
@@ -89,7 +109,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
                     </button>
 
-                    {classroom?.status === 'active' &&
+                    {classroom?.status === 'Active' &&
                         (
                             <button onClick={startWhiteboard}>
                                 <MdCall className="text-2xl text-[#6c30d0] w-8 h-8 cursor-pointer" />
@@ -112,7 +132,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                             </p>
 
                             <div className="flex items-center space-x-4">
-                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${classroom?.status === 'active'
+                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${classroom?.status === 'Active'
                                     ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                                     : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                                     }`}>
@@ -148,7 +168,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                             </div>
                         ):(!classroom?.teacher && userData?.role === 'Admin') ?(
                             <button 
-                            onClick={assignTeacher}
+                            onClick={getTeacher}
                             className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800 dark:text-white cursor-pointer">
                             Assign Teacher
                             </button>
@@ -188,6 +208,34 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         ))}
                     </div>
                 </div>
+                {
+                    userData?.role === 'Admin' && isTeacherActive && (
+                        <div className="lg:col-span-1">
+                            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                                        Select one teacher
+                                    </h2>
+                                </div>
+                                <div className="p-6">
+                                    <div className="space-y-4">
+                                        {
+                                            teachers?.map((teacher: User) => (
+                                                <TeacherCard
+                                                    key={teacher._id}
+                                                    teacher={teacher}
+                                                    classroomId={classroom?._id}
+                                                    handleTeacherActive={handleTeacherActive}
+                                                />
+                                            ))
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    )
+                }
 
                 {/* Right Column - Students and Course Info */}
                 <div className="space-y-6">

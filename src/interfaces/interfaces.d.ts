@@ -23,7 +23,8 @@ interface User {
     phone: string,
     gender: string,
     profilePicture: string,
-    role: string
+    role: string,
+    skills?: string[] | null,
 }
 
 interface Classroom {
@@ -31,7 +32,7 @@ interface Classroom {
     name: string;
     description: string;
     students: User[];
-    status: 'active' | 'inactive' | 'archived';
+    status: 'Active' | 'Approved' | 'Pending';
     teacher: User;
     practiceSet?: string | null;
     course?: Course;

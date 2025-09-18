@@ -50,7 +50,7 @@ export async function POST(req: NextRequest,{ params }: { params: Promise<{ stud
             name,
             description,
             course: courseId,
-            status: "completed",
+            status: "Approved",
             students: [studentId],
             subscription: subscriptionId
         });

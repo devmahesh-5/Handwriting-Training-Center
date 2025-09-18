@@ -7,6 +7,9 @@ import { MdLaunch, MdSearch } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 
+import Loading from '@/components/Loading';
+import { Course, userData } from '@/interfaces/interfaces';
+
 const Courses = () => {
     const [query, setQuery] = useState<string>("");
     const [courses, setCourses] = useState<Course[] | null>(null);

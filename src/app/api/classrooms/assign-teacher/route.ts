@@ -15,9 +15,6 @@ export async function PATCH(req: NextRequest) {
 
     try {
         const user = await getDataFromToken(req);
-
-        //i want to assign a teacher to a classroom and get id and teacher id from query
-
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");
         const teacherId = searchParams.get("teacherId");
@@ -28,6 +25,7 @@ export async function PATCH(req: NextRequest) {
         }
 
         const teacher = await User.findById(teacherId);
+
         if (!teacher || teacher.role !== "Teacher") {
             throw new ApiError(404, "Teacher not found");
         }
@@ -36,21 +34,23 @@ export async function PATCH(req: NextRequest) {
             throw new ApiError(401, "User Session expired or not logged in");
         }
 
-        if (user.isVerified === false) {
+        if (!user.isVerified) {
             throw new ApiError(401, "User is not verified");
         }
 
-        if (user.role !== "admin") {
+        if (user.role !== "Admin") {
             throw new ApiError(401, "only admin can update classroom");
         }
 
         const updatedClassroom = await Classroom.
             findByIdAndUpdate(
                 id, {
-                teacher: teacherId
+                teacher: teacherId,
+                status: "Active"
             }, {
                 new: true
             });
+
         return NextResponse.
             json({
                 message: "Classroom updated successfully",

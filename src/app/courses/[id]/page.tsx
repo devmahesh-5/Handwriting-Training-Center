@@ -10,6 +10,8 @@ import { useSelector } from 'react-redux';
 import { useForm, useWatch } from 'react-hook-form';
 import {useRouter} from 'next/navigation';
 
+import { userData } from '@/interfaces/interfaces';
+
 interface submissionData {
   paymentProof?: FileList | null;
 }
@@ -229,7 +231,7 @@ export default function CourseDetailPage() {
               </span>
             </div>
 
-            {userData.role === "student" ?(<button
+            {userData.role === "Student" ?(<button
               onClick={() => setOpenPayment(prev => !prev)}
               className="bg-[#6C48E3] hover:bg-gray-700 text-white px-6 py-2 rounded-md font-medium transition-colors cursor-pointer">
               Enroll Now
@@ -331,14 +333,14 @@ export default function CourseDetailPage() {
         <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800">
           <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 dark:text-white">Practice Sets</h2>
-          <button
+          {userData?.role === 'Admin' && practiceSets?.length === 0 &&(<button
               onClick={getPracticeSet}
               className="bg-[#6C48E3] hover:bg-gray-700 text-white px-6 py-2 rounded-md font-medium transition-colors cursor-pointer">
               Add Practice Set
-            </button>
+            </button>)}
             </div>
 
-            {isPracticeSetActive &&(
+            {isPracticeSetActive && userData?.role === 'Admin' &&(
               loadingPracticeset? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-300">
                   <p>Loading practice sets...</p>

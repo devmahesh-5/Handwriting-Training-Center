@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
         const role = formData.get('role') as string;
         const phone = formData.get('phone') as string;
         const gender = formData.get('gender') as string;
+        const skills = formData.getAll('skills') as string[];
         if ([fullName, email, password, username, role, phone, gender].some(field => !field)) {
             throw new ApiError(400, "All fields are required");
         }
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest) {
             phone,
             gender,
             profilePicture: uploadedProfile?.secure_url || null,
+            skills
         });
         await newUser.save();
         return NextResponse.json(

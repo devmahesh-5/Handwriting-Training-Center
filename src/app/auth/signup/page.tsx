@@ -21,6 +21,7 @@ type SignupFormFields = {
   gender: string;
   profilePicture?: FileList | null;
   role: string;
+  skills?: string | null
 };
 
 export default function SignupPage() {
@@ -48,6 +49,12 @@ export default function SignupPage() {
     formData.append("gender", data.gender);
     formData.append("username", data.username);
     formData.append("role", data.role);
+
+    if (data.skills) {
+      const skillsArray = data.skills.split(",").map(s => s.trim());
+      formData.append("skills", skillsArray.join(","));
+    }
+
     if (data.profilePicture && data.profilePicture.length > 0) {
       formData.append("profilePicture", data.profilePicture[0]);
     }
@@ -233,6 +240,22 @@ export default function SignupPage() {
                 error={errors.role?.message}
                 {...register("role", { required: "Role is required" })}
               />
+
+              {
+                watch("role") === "Teacher" && (
+                  <Input
+                    type="text"
+                    label="Specialization"
+                    placeholder="Enter your specialization comma separated"
+                    className="w-full rounded-lg"
+                    {...register("skills", {
+                      required: "Specialization is required"
+                    })}
+                    error={errors.skills?.message}
+                  />
+                )
+              }
+
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-[#F2F4F7]">

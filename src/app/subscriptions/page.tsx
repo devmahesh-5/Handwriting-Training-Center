@@ -6,6 +6,7 @@ import axios, { AxiosError } from 'axios';
 import { useSelector } from 'react-redux';
 import SubscriptionCard from '@/components/SubscriptionCard';
 import Loading from '@/components/Loading';
+import { Course, User, userData } from '@/interfaces/interfaces';
 
 interface Subscription {
     _id: string,

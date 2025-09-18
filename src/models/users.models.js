@@ -74,6 +74,10 @@ const userSchema = new mongoose.Schema({
     sessionId: {
         type: Number,
         default:new Date().getTime()
+    },
+    skills: {
+        type: [String],
+        default: []
     }
 },{ timestamps: true });
 

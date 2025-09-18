@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import axios, { AxiosError } from 'axios';
 import Loading from './Loading';
+import { Course, User } from '@/interfaces/interfaces';
 
 interface Props {
     _id?: string,
