@@ -100,7 +100,7 @@ interface Practice {
     title: string,
     instruction: string,
     image: string,
-    difficulty: string,
+    difficulty: 'Beginner' | 'Intermediate' | 'Advanced',
     tags: string[],
     xp: number,
     video:string,

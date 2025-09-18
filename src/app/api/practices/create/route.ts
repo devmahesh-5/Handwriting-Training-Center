@@ -10,60 +10,62 @@ import { ApiError } from "@/utils/ApiError";
 connectDB();
 
 export async function POST(request: NextRequest) {
-    const formData = await request.formData();
-    const title = formData.get("title") as string;
-    const instruction = formData.get("instruction") as string;
-    const image = formData.get("image") as File;
-    const video = formData.get("video") as File;
-    const user = await getDataFromToken(request);
-    const xp = formData.get("xp") as string;
-    const tags = formData.get("tags") as string;
-    const difficulty = formData.get("difficulty") as string;
 
-    [title, instruction, xp, tags, difficulty].forEach((field) => {
-        if (!field) {
-            throw new ApiError(400, "All fields are required");
-        }
-    });
-
-    if (!user) {
-       throw new ApiError(404,"user not Found");
-    }
-
-    if (user.isVerified === false || user.role !== "admin") {
-        throw new ApiError(400,"user not verified")
-    }
-
-    let uploadedImage = null;
-    let uploadedVideo = null;
-
-    if (image instanceof File && image.size > 0) {
-
-        const tempFilePath = await saveBuffer(image);
-        uploadedImage = await uploadOnCloudinary(tempFilePath);
-
-        if (!uploadedImage) {
-            return NextResponse.json({ message: "Error uploading image" }, { status: 500 });
-        }
-
-    }
-
-    if (video instanceof File && video.size > 0) {
-
-        const tempFilePath = await saveBuffer(video);
-
-        uploadedVideo = await uploadOnCloudinary(tempFilePath);
-        if (!uploadedVideo) {
-            throw new ApiError(500, "Error uploading video");
-        }
-    }
 
     try {
+        const formData = await request.formData();
+        const title = formData.get("title") as string;
+        const instruction = formData.get("instruction") as string;
+        const image = formData.get("image") as File;
+        const video = formData.get("video") as File;
+
+        const xp = formData.get("xp") as string;
+        const tags = formData.get("tags") as string;
+        const difficulty = formData.get("difficulty") as string;
+        const user = await getDataFromToken(request);
+        [title, instruction, xp, tags, difficulty].forEach((field) => {
+            if (!field) {
+                throw new ApiError(400, "All fields are required");
+            }
+        });
+
+        if (!user) {
+            throw new ApiError(404, "user not Found");
+        }
+
+        if (user.isVerified === false || user.role !== "Admin") {
+            throw new ApiError(400, "user not verified")
+        }
+
+        let uploadedImage = null;
+        let uploadedVideo = null;
+
+        if (image instanceof File && image.size > 0) {
+
+            const tempFilePath = await saveBuffer(image);
+            uploadedImage = await uploadOnCloudinary(tempFilePath);
+
+            if (!uploadedImage) {
+                return NextResponse.json({ message: "Error uploading image" }, { status: 500 });
+            }
+
+        }
+
+        if (video instanceof File && video.size > 0) {
+
+            const tempFilePath = await saveBuffer(video);
+
+            uploadedVideo = await uploadOnCloudinary(tempFilePath);
+            if (!uploadedVideo) {
+                throw new ApiError(500, "Error uploading video");
+            }
+        }
+
         const practice = await Practice.create({
             title,
             instruction,
-            image:uploadedImage?.secure_url,
-            video:uploadedVideo?.secure_url,
+            image: uploadedImage?.secure_url,
+            video: uploadedVideo?.secure_url,
             xp,
             tags,
             difficulty
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
                 {
                     status: 201
                 });
-    } catch (error:unknown) {
+    } catch (error: unknown) {
         console.error("Error creating practice:", error);
         return NextResponse.
             json({

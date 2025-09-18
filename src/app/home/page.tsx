@@ -170,7 +170,7 @@ function DashboardPage() {
 
         />
 
-        <section className='col-span-1 md:col-span-2 lg:col-span-2 flex flex-col gap-4'>
+        {/* <section className='col-span-1 md:col-span-2 lg:col-span-2 flex flex-col gap-4'>
         <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>Practice Sets : Learn By Doing</h2>
           {
             Practice?.map((practice, index) => (
@@ -178,15 +178,14 @@ function DashboardPage() {
                 key={index}
                 title={practice.title}
                 _id={practice._id}
-                description={practice?.instruction || "No description available"}
+                instruction={practice?.instruction || "No description available"}
                 difficulty={practice.difficulty}
                 tags={practice.tags}
                 xpReward={practice.xp}
-                onStart={() => console.log(`Starting practice: ${practice.title}`)}
               />
             ))
           }
-        </section>
+        </section> */}
       </div>
 
     </main>

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 interface Props {
     _id?: string;
     title: string;
-    description?: string;
+    instruction?: string;
     difficulty?: string;
     tags?: string[];
     xpReward?: number;
@@ -12,7 +12,8 @@ interface Props {
 }
 
 function PracticeCard(props: Props) {
-    const { title, description, difficulty, tags, xpReward, onStart } = props;
+    
+    const { title, instruction, difficulty, tags, xpReward, _id} = props;
     const router = useRouter();
     return (
         <div className="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer">
@@ -35,10 +36,10 @@ function PracticeCard(props: Props) {
                     )}
                 </div>
 
-                {/* Description */}
-                {description && (
+                {/* instruction */}
+                {instruction && (
                     <p className="text-gray-600 dark:text-gray-300 text-sm mb-5 line-clamp-3 leading-relaxed">
-                        {description}
+                        {instruction}
                     </p>
                 )}
 
@@ -70,10 +71,12 @@ function PracticeCard(props: Props) {
                     </div>
                     
                     <button 
-                        onClick={()=>router.push(`/practices/${props._id}`)}
+                        onClick={()=>{router.push(`/practices/view/${_id}`)
+                        }}
                         className="relative inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 cursor-pointer"
                     >
-                        Start Practice
+                        View
+
                         <svg className="ml-1.5 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>

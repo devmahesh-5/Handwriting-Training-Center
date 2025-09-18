@@ -10,7 +10,6 @@ connectDB();
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string, practiceEntryId: string }> }) {
     try {
-
         const { _id: userId } = await getDataFromToken(req);
         const { id, practiceEntryId } = await params;
         if (!isValidObjectId(userId)) {
@@ -23,6 +22,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
                 $addToSet: {
                     practiceEntry: practiceEntryId
                 }
+            },
+            {
+                new: true
             }
         )
 

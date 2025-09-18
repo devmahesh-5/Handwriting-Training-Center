@@ -23,10 +23,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             },
             {
                 $lookup: {
-                    from: "practiceentrys",
+                    from: "practiceentries",
                     localField: "practiceEntry",
                     foreignField: "_id",
-                    as: "practiceEntry",
+                    as: "practiceEntries",
                     pipeline: [
                         {
                             $lookup: {
@@ -34,6 +34,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
                                 localField: "practice",
                                 foreignField: "_id",
                                 as: "practice"
+                            }
+                        },
+                        {
+                            $addFields: {
+                                practice: { $arrayElemAt: ["$practice", 0] }
                             }
                         }
                     ]
@@ -58,10 +63,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             },
             {
                 $project: {
+                    practiceEntries: 1,
                     practiceEntry: 1,
                     course: 1,
                     title: 1,
-                    discription: 1,
+                    description: 1,
                     _id: 1,
                     updated_at: 1
                 }
