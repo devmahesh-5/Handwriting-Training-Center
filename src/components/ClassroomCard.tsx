@@ -21,7 +21,7 @@ interface Props {
   course: Course;
   description?: string;
   teacher?: Teacher;
-  status: 'active' | 'completed' | 'locked';
+  status: 'Active' | 'Approved' | 'Pending';
 }
 
 function ClassroomCard(props: Props) {
@@ -59,9 +59,9 @@ function ClassroomCard(props: Props) {
           </div>
           {status && (
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              status === 'active' 
+              status === 'Active' 
                 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                : status === 'completed'
+                : status === 'Approved'
                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                 : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
             }`}>

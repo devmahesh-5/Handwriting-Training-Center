@@ -59,7 +59,7 @@ const Courses = () => {
     };
 
 
-    return (
+    return !loading && !error ? (
         <div className="bg-gray-100 dark:bg-gray-800">
             <div className="flex gap-4 justify-space-between items-center w-full max-w-md py-2 px-4">
                 <div className="flex w-full rounded-full shadow-sm border border-gray-300 overflow-hidden bg-[#F2F4F7] focus-within:ring-2 focus-within:ring-gray-500">
@@ -129,6 +129,12 @@ const Courses = () => {
                     <p className="text-red-500">{error}</p>
                 </div>
             )}
+        </div>
+    ):!error?(
+        <Loading message={"Fetching Courses"} />
+    ):(
+        <div className="flex flex-col gap-4 bg-gray-100 p-4 dark:bg-gray-800 min-h-screen">
+            <p className="text-red-500">{error}</p>
         </div>
     )
 }

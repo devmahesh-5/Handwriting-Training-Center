@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash } from "react-icons/fa";
 import { io, Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
+import { userData } from "@/interfaces/interfaces";
 
 type PeerInfo = {
   stream: MediaStream;

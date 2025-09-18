@@ -58,8 +58,6 @@ const Subscriptions = () => {
 
     },[]);
 
-    console.log('subscriptions',subscriptions);
-
     if(!subscriptions){  return ( 
         <div className="flex flex-col items-center justify-center bg-gray-100 p-4 dark:bg-gray-800 min-h-screen w-full">
                 <div className="flex flex-col items-center justify-center h-full w-full">

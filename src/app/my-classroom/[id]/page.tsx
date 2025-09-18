@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import PracticeEntryCard from '@/components/PracticeEntryCard';
 import Loading from '@/components/Loading';
-
+import { Classroom, userData,PracticeEntry } from '@/interfaces/interfaces';
 
 const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [classroom, setClassroom] = useState<Classroom | null>(null);
@@ -84,7 +84,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
                     </button>
 
-                    {classroom?.status === 'active' &&
+                    {classroom?.status === 'Active' &&
                         (
                             <button onClick={startWhiteboard}>
                                 <MdCall className="text-2xl text-[#6c30d0] w-8 h-8 cursor-pointer" />
@@ -107,7 +107,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                             </p>
 
                             <div className="flex items-center space-x-4">
-                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${classroom?.status === 'active'
+                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${classroom?.status === 'Active'
                                     ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                                     : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                                     }`}>
@@ -153,14 +153,14 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
                         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                                Practice Set: {classroom?.practiceSet?.title}
+                                Practice Set: {classroom?.course?.practiceSet?.title}
                             </h2>
                             <p className="text-gray-600 dark:text-gray-300 mt-1">
-                                {classroom?.practiceSet?.description}
+                                {classroom?.course?.practiceSet?.description}
                             </p>
                         </div>
 
-                        {classroom?.practiceSet?.practiceEntries?.map((entry: PracticeEntry) => (
+                        {classroom?.course?.practiceSet?.practiceEntries?.map((entry: PracticeEntry) => (
                             <PracticeEntryCard
                                 classroomId={classroom._id}
                                 key={entry._id}
@@ -200,7 +200,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                     <div>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">Practice Sets</p>
                                         <p className="text-gray-900 dark:text-white">
-                                            {classroom.practiceSet.practiceEntries?.length || 0} exercises
+                                            {classroom?.course?.practiceSet?.practiceEntries?.length || 0} exercises
                                         </p>
                                     </div>
                                 )}

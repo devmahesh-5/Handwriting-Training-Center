@@ -1,7 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import { MdMore } from 'react-icons/md';
 interface Props {
     _id?: string;
     title: string;

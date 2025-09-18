@@ -120,10 +120,10 @@ return !loading ?(
             {/* Action Button */}
             <div className="flex justify-between items-center mt-6">
                 <button
-                    className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                    className={`px-6 py-2 rounded-lg font-medium transition-all cursor-pointer ${
                         classroom 
                             ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 dark:bg-blue-500 dark:hover:bg-blue-600'
-                            : `bg-gray-200 text-gray-600 ${ !isAdmin && 'cursor-not-allowed' }dark:bg-gray-700 dark:text-gray-400`
+                            : `${ !isAdmin ? ('cursor-not-allowed dark:bg-gray-700 dark:text-gray-400 bg-gray-200 text-gray-600 hover:dark:bg-gray-200 hover:dark:text-gray-600 hover:bg-gray-300'):('bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 dark:bg-indigo-500 dark:hover:bg-indigo-600') }`
                     }`}
                     onClick={handleClassroom}
                     disabled={!classroom && !isAdmin}

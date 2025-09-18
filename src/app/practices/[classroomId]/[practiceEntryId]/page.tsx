@@ -11,6 +11,8 @@ import Evaluation from '@/components/Evaluation';
 
 import Loading from '@/components/Loading';
 
+import { PracticeEntry, userData,PracticeSolution, Practice,User } from '@/interfaces/interfaces';
+
 interface submissionData {
   submissionFile?: FileList | null;
 }

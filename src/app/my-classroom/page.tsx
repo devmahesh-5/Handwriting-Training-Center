@@ -3,27 +3,7 @@ import React, { useState, useEffect } from 'react'
 import ClassroomCard from '@/components/ClassroomCard';
 import axios, { AxiosError } from 'axios';
 import Loading from '@/components/Loading';
-
-interface Classroom {
-  _id?: string;
-  name: string;
-  status: 'active' | 'completed' | 'locked';
-  description: string;
-  students: string[];
-  teacher: {
-    fullName: string;
-    profilePicture?: string;
-  };
-  course: {
-    name: string;
-    duration: string;
-    thumbnail: string;
-  };
-  payment: string;
-  subscription: string;
-  practiceSet: string;
-  totalXp: number;
-}
+import { Classroom } from '@/interfaces/interfaces';
 
 
 const MyClassrooms = () => {
@@ -64,7 +44,7 @@ const MyClassrooms = () => {
                             id={classroom._id}
                             title={classroom.name || "Unknown Classroom"}
                             currentXp={classroom?.totalXp || 10}
-                            status={classroom?.status || "locked"}
+                            status={classroom?.status || "Pending"}
                             xp={classroom?.totalXp || 100}
                             duration={classroom?.course?.duration || "N/A"}
                             description={classroom?.description || "N/A"}

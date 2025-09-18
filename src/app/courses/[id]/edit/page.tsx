@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react'
 import CourseForm from '@/components/forms/CourseForm';
 import axios, { AxiosError } from 'axios';
 import Loading from '@/components/Loading';
+import { Course } from '@/interfaces/interfaces';
 
 const EditCourse = ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = React.use(params);

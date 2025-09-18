@@ -7,6 +7,8 @@ import { MdBackspace, MdBrush, MdCallEnd } from "react-icons/md";
 import VideoRoom from "@/components/Videoroom";
 import { useRouter } from "next/navigation";
 
+import { userData } from "@/interfaces/interfaces";
+
 type Stroke = {
   x0: number;
   y0: number;

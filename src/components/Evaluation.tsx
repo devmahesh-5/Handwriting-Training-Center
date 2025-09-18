@@ -1,8 +1,8 @@
 'use client'
 import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
 import Image from 'next/image';
 import axios, { AxiosError } from 'axios';
+import {User, Practice} from '@/interfaces/interfaces';
 
 interface props {
     _id: string;

@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { login, logout } from '@/store/authSlice';
 import axios, { AxiosError } from 'axios';
 import { usePathname } from 'next/navigation';
+import { userData } from '@/interfaces/interfaces';
 
 export default function Header() {
     const pathname = usePathname();

@@ -4,7 +4,7 @@
 import React from "react";
 import {useSelector} from 'react-redux';
 import Link from 'next/link'
-
+import { userData } from "@/interfaces/interfaces";
 
 export default function LandingPage() {
   const authStatus = useSelector((state: { auth: { status: boolean; userData: userData; }}) => state.auth.status);

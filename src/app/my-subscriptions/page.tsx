@@ -1,11 +1,10 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import axios, { AxiosError } from 'axios';
-import { useSelector } from 'react-redux';
 import SubscriptionCard from '@/components/SubscriptionCard';
 import Loading from '@/components/Loading';
+import { Subscription } from '@/interfaces/interfaces';
 
 const MySubscription = () => {
     const [subscriptions, setSubscriptions] = useState<Subscription[] | null>(null);

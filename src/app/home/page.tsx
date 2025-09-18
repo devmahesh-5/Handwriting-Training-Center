@@ -7,11 +7,12 @@ import CourseCard from '@/components/CourseCard';
 import PracticeCard from '@/components/PracticeCard';
 import axios, { AxiosError } from 'axios';
 import Loading from '@/components/Loading';
+import { userData } from '@/interfaces/interfaces';
 
 interface Classroom {
   _id?: string;
   name: string;
-  status: 'active' | 'completed' | 'locked';
+  status: 'Active' | 'Approved' | 'Pending';
   description: string;
   students: string[];
   teacher: {
@@ -138,7 +139,7 @@ function DashboardPage() {
           id={userClassrooms?._id}
           title={userClassrooms?.name || "Unknown Classroom"}
           currentXp={userClassrooms?.totalXp || 10}
-          status={userClassrooms?.status || "locked"}
+          status={userClassrooms?.status || "Pending"}
           xp={userClassrooms?.totalXp || 100}
           duration={userClassrooms?.course?.duration || "N/A"}
           description={userClassrooms?.description || "N/A"}
