@@ -1,5 +1,6 @@
 import path from "path";
 
+
 interface User {
     _id: string,
     fullName: string,
@@ -142,3 +143,4 @@ interface Subscription {
     updatedAt: date,
     __v: number
 }
+
