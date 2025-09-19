@@ -41,7 +41,10 @@ const classroomSchema = new mongoose.Schema({
         default: 'Pending',
         required: true,
     },
-    
+    totalXp: {
+        type: Number,
+        default: 0
+    },
 
 }, {
     timestamps: true

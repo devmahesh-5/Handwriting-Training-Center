@@ -1,6 +1,8 @@
 'use client'
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { userData } from '@/interfaces/interfaces';
 interface Teacher {
   fullName: string;
   profilePicture?: string;
@@ -16,7 +18,7 @@ interface Props {
   id?: string;
   title: string;
   xp: number;
-  currentXp?: number;
+  currentXp?: number | null;
   duration: string;
   course: Course;
   description?: string;
@@ -36,9 +38,12 @@ function ClassroomCard(props: Props) {
         teacher,
         status,
     }= props
-     const progressPercentage = Math.min(Math.round((currentXp / xp) * 100), 100);
+    console.log(currentXp, xp)
+     const progressPercentage = Math.min(Math.round((currentXp ?? 0 / xp) * 100), 100);
    
     const router = useRouter();
+
+    const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
   return (
     
     <div 
@@ -78,7 +83,7 @@ function ClassroomCard(props: Props) {
         )}
 
         {/* Progress bar */}
-        <div className="mb-4">
+        {userData?.role === 'Student' && (<div className="mb-4">
           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
             <span>Progress</span>
             <span>{progressPercentage}%</span>
@@ -89,7 +94,7 @@ function ClassroomCard(props: Props) {
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
-        </div>
+        </div>)}
 
         {/* Footer with metadata */}
         <div className="mt-auto flex items-center justify-between">

@@ -67,7 +67,7 @@ function PracticeEntryCard(props: Props) {
     return (
         <div
             key={_id}
-            className={`p-4 border-b rounded-lg border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-900 transition-colors ${status === 'locked' ? 'opacity-70' : ''
+            className={`p-4 border-b rounded-lg border-gray-200 dark:border-gray-700 hover:bg-gray-50 cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-900 transition-colors ${status === 'locked' ? 'opacity-70' : ''
                 }`}
         >
             {error && <div className="text-red-500">{error}</div>}

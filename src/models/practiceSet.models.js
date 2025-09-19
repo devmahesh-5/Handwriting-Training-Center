@@ -19,7 +19,11 @@ const practiceSetSchema = new mongoose.Schema(
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'PracticeEntry'
             }
-        ]
+        ],
+        totalXp:{
+            type: Number,
+            default: 0
+        }
         
     },
     {

@@ -7,7 +7,8 @@ import CourseCard from '@/components/CourseCard';
 import PracticeCard from '@/components/PracticeCard';
 import axios, { AxiosError } from 'axios';
 import Loading from '@/components/Loading';
-import { userData } from '@/interfaces/interfaces';
+import { userData, User } from '@/interfaces/interfaces';
+import { FiAnchor, FiAward, FiBook, FiPenTool, FiUser } from 'react-icons/fi';
 
 interface Classroom {
   _id?: string;
@@ -67,15 +68,21 @@ function DashboardPage() {
 
   const [userClassrooms, setUserClassrooms] = useState<Classroom | null>();
   const [userCourses, setUserCourses] = useState<Course | null>();
-  const [Practice, setPractice] = useState<Practice[] | null>();
+  const [currentMarks, setCurrentMarks] = useState<number | null>(null);
+  const [leaderBoard, setLeaderBoard] = useState<User[] | null>(null);
+  
   const fetchUserClassrooms = async () => {
     try {
       setLoading(true);
       const response = await axios.get('/api/classrooms/get-my-classroom');
+      if(response){
+        const currentMark = await axios.get(`/api/practice-solution/my-solution/${response?.data?.classroom?.[0]?._id}`);
+        setCurrentMarks(currentMark?.data?.solutions[0]?.currentMarks);
+      }
       return response?.data?.classroom?.[0];
 
     } catch (error: unknown) {
-      
+
       if (error instanceof AxiosError) {
         setError(error.response?.data?.message || "An error occurred while fetching classrooms");
       }
@@ -98,18 +105,15 @@ function DashboardPage() {
 
     }
   }
-
-  const fetchPractice = async () => {
+  const fetchLeaderBoard = async () => {
     try {
-      const response = await axios.get('/api/practices');
-      return response.data.practices;
-
+      const response = await axios.get('/api/users/leaderboard');
+      return response.data.leaderBoard
     } catch (error: unknown) {
-      console.error("Error fetching practices:", error);
+      console.error("Error fetching LeaderBoard:", error);
       if (error instanceof AxiosError) {
-        setError(error.response?.data?.message || "An error occurred while fetching practices");
+        setError(error.response?.data?.message || "An error occurred while fetching LeaderBoard");
       }
-
     }
   }
 
@@ -117,14 +121,15 @@ function DashboardPage() {
     ; (
       async () => {
         if (authStatus) {
-          const [userClassrooms, userCourses, Practice] = await Promise.all([
+          const [userClassrooms, userCourses, leaderBoard] = await Promise.all([
             fetchUserClassrooms(),
             fetchUserCourses(),
-            fetchPractice()
+            fetchLeaderBoard()
           ])
           setUserClassrooms(userClassrooms);
           setUserCourses(userCourses);
-          setPractice(Practice);
+          setLeaderBoard(leaderBoard)
+
         }
       }
     )();
@@ -135,29 +140,8 @@ function DashboardPage() {
   return !loading ? (
     <main className="min-h-screen dark:bg-gray-800 bg-[#F2F4F7] loading-lazy">
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto w-full px-4 py-3 sm:w-11/12'>
-        <ClassroomCard
-          id={userClassrooms?._id}
-          title={userClassrooms?.name || "Unknown Classroom"}
-          currentXp={userClassrooms?.totalXp || 10}
-          status={userClassrooms?.status || "Pending"}
-          xp={userClassrooms?.totalXp || 100}
-          duration={userClassrooms?.course?.duration || "N/A"}
-          description={userClassrooms?.description || "N/A"}
-          course={userClassrooms?.course || { name: "N/A", duration: "N/A", thumbnail: "/course.png" }}
-          teacher={userClassrooms?.teacher || { fullName: "N/A", profilePicture: "/profile.png" }}
-        />
-
-        <CourseCard
-          _id={userCourses?._id}
-          title={userCourses?.name || "N/A"}
-          duration={userCourses?.duration}
-          description={userCourses?.description || "N/A"}
-          thumbnail={userCourses?.thumbnail || '/course.png'} 
-          isNew = {true}
-          />
 
         <ProfileCard
-
           fullName={userData?.fullName || "N/A"}
           profilePicture={userData?.profilePicture || "/profile.png"}
           email={userData?.email || "N/A"}
@@ -166,9 +150,65 @@ function DashboardPage() {
           phone={userData?.phone || "N/A"}
           role={userData?.role || "N/A"}
           isVerified={userData?.isVerified || false}
-          memberSince={userData?.created_at || "2025"} // Default if not provided
-
+          memberSince={userData?.createdAt?.slice(0, 7) || "2025"} // Default if not provided
+          totalClassAttended={userData?.totalClassAttended || 0}
+          xps={userData?.xps || 0}
+          skills={userData?.skills || []}
         />
+
+
+        <CourseCard
+          _id={userCourses?._id}
+          title={userCourses?.name || "N/A"}
+          duration={userCourses?.duration}
+          description={userCourses?.description || "N/A"}
+          thumbnail={userCourses?.thumbnail || '/course.png'}
+          isNew={true}
+        />
+        <div className='flex flex-col row-span-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden'>
+         <h2 className='text-2xl font-semibold mb-4 bg-gray-100 dark:bg-gray-800 p-3'>Leaderboard</h2>
+        {
+          leaderBoard && leaderBoard.length > 0 && leaderBoard.map((student, index) => (
+            <div key={student._id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg dark:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer hover:bg-gray-200">
+              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold">
+                {index + 1}
+              </div>
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                {student?.profilePicture ? (<img src={student.profilePicture} alt={student.fullName} className="w-10 h-10 rounded-full" />) : (<FiUser className="w-5 h-5 text-green-600" />)}
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900 dark:text-white">{student.fullName}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{student.email}</p>
+
+              </div>
+              {userData?.role === 'Student'?(<div className="flex items-center space-x-2">
+                <p className="font-medium text-gray-900 dark:text-white">{student?.xps || 0}</p>
+                <FiAward className="w-5 h-5 text-green-600" />
+              </div>):(
+                <div className="flex items-center space-x-2">
+                  <p className="font-medium text-gray-900 dark:text-white">{student?.totalClassAttended || 0}</p>
+                  <FiBook className="w-5 h-5 text-green-600" />
+                </div>
+              )}
+            </div>
+          ))
+        }
+
+        </div>
+
+        <ClassroomCard
+          id={userClassrooms?._id}
+          title={userClassrooms?.name || "Unknown Classroom"}
+          currentXp={currentMarks }
+          status={userClassrooms?.status || "Pending"}
+          xp={userClassrooms?.totalXp || 100}
+          duration={userClassrooms?.course?.duration || "N/A"}
+          description={userClassrooms?.description || "N/A"}
+          course={userClassrooms?.course || { name: "N/A", duration: "N/A", thumbnail: "/course.png" }}
+          teacher={userClassrooms?.teacher || { fullName: "N/A", profilePicture: "/profile.png" }}
+        />
+
+
 
         {/* <section className='col-span-1 md:col-span-2 lg:col-span-2 flex flex-col gap-4'>
         <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>Practice Sets : Learn By Doing</h2>
@@ -190,7 +230,7 @@ function DashboardPage() {
 
     </main>
   ) : (
-    <Loading message={"Loading Dashboard ..."}/>
+    <Loading message={"Loading Dashboard ..."} />
   )
 }
 

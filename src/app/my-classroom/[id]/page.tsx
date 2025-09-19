@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import PracticeEntryCard from '@/components/PracticeEntryCard';
 import Loading from '@/components/Loading';
-import { Classroom, userData,PracticeEntry } from '@/interfaces/interfaces';
+import { Classroom, userData, PracticeEntry } from '@/interfaces/interfaces';
 
 const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [classroom, setClassroom] = useState<Classroom | null>(null);
@@ -84,13 +84,17 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
                     </button>
 
-                    {classroom?.status === 'Active' &&
+                    {/* {classroom?.status === 'Active' &&
                         (
                             <button onClick={startWhiteboard}>
                                 <MdCall className="text-2xl text-[#6c30d0] w-8 h-8 cursor-pointer" />
                             </button>
                         )
-                    }
+                    } */}
+                    <button onClick={startWhiteboard}>
+                        <MdCall className="text-2xl text-[#6c30d0] w-8 h-8 cursor-pointer" />
+                    </button>
+
                 </div>
 
             </div>

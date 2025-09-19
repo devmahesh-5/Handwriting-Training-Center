@@ -95,7 +95,10 @@ interface userData {
   isVerified: boolean;
   role: string;
   gender: string;
-  created_at?: string;
+  createdAt?: string;
+  totalClassAttended?: number;
+  skills?: string[] | null;
+  xps?: number | null;
 }
 
 interface Practice {

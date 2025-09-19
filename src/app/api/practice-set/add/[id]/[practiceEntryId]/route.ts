@@ -5,6 +5,7 @@ import getDataFromToken from "@/helpers/checkAuth";
 import mongoose, { isValidObjectId } from "mongoose";
 import PracticeSet from "@/models/practiceSet.models";
 import { ApiError } from "@/utils/ApiError";
+import PracticeEntry from "@/models/practiceEntry.models";
 
 connectDB();
 
@@ -16,11 +17,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             throw new ApiError(404, "user not Authenticated")
         }
 
+        const practiceEntry = await PracticeEntry.findById(practiceEntryId);
+
         const updatedPracticeSet = await PracticeSet.findByIdAndUpdate(
             id,
             {
                 $addToSet: {
                     practiceEntry: practiceEntryId
+                },
+                $inc: {
+                    totalXp: practiceEntry.totalMarks
                 }
             },
             {
@@ -70,6 +76,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             throw new ApiError(404, "invalid practice entry or practice set id");
         }
 
+        const practiceEntry = await PracticeEntry.findById(practiceEntryId);
+
+        if (!practiceEntry) {
+            throw new ApiError(404, "no practice entry found");
+        }
+
         const updatedPracticeSet = await PracticeSet.updateOne(
             {
                 _id: id
@@ -77,6 +89,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             {
                 $pull: {
                     practiceEntry: practiceEntryId
+                },
+                $inc: {
+                    totalXp: -practiceEntry.totalMarks
                 }
             }
         )
