@@ -213,7 +213,7 @@ interface Dashboard {
     topCourses: Course[],
     courseEarning: GroupedCourses[],
     leaderBoard: User[],
-    teachersWithClassrooms: any[]
+    teachersWithClassrooms: teacherWithClassrooms[]
 
 }
 
