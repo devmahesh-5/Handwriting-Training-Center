@@ -8,7 +8,7 @@ import PracticeEntry from '@/models/practiceEntry.models';
 
 connectDB();
 
-export async function Patch(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
 
         const user = await getDataFromToken(req);
