@@ -15,6 +15,18 @@ export async function PATCH(req: NextRequest) {
 
     try {
         const user = await getDataFromToken(req);
+
+        if (!user) {
+            throw new ApiError(401, "User Session expired or not logged in");
+        }
+
+        if (!user.isVerified) {
+            throw new ApiError(401, "User is not verified");
+        }
+
+        if (user.role !== "Admin") {
+            throw new ApiError(401, "only admin can update classroom");
+        }
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");
         const teacherId = searchParams.get("teacherId");
@@ -30,18 +42,6 @@ export async function PATCH(req: NextRequest) {
             throw new ApiError(404, "Teacher not found");
         }
 
-        if (!user) {
-            throw new ApiError(401, "User Session expired or not logged in");
-        }
-
-        if (!user.isVerified) {
-            throw new ApiError(401, "User is not verified");
-        }
-
-        if (user.role !== "Admin") {
-            throw new ApiError(401, "only admin can update classroom");
-        }
-
         const updatedClassroom = await Classroom.
             findByIdAndUpdate(
                 id, {
@@ -50,6 +50,25 @@ export async function PATCH(req: NextRequest) {
             }, {
                 new: true
             });
+        
+        
+        
+        if (!updatedClassroom) {
+            throw new ApiError(404, "Classroom not found");
+        }
+
+        const updatedTeacher = await User.
+            findByIdAndUpdate(
+                teacherId, {
+                $inc: { totalClassAttended: 1 }
+            }, {
+                new: true
+            });
+        
+
+        if (!updatedTeacher) {
+            throw new ApiError(404, "Teacher not updated");
+        }
 
         return NextResponse.
             json({

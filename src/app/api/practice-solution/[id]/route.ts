@@ -119,6 +119,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             new: true
         });
 
+        const updatedUser = await User.findByIdAndUpdate(user._id, {
+            $inc: {
+                xps: marks
+            }
+        })
+
         return NextResponse.
             json({
                 message: "Practice updated successfully",

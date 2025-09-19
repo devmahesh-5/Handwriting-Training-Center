@@ -81,9 +81,9 @@ const Courses = () => {
                 </div>
                 {userData.role ==='Admin' &&(<button
                     onClick={() => router.push('/courses/add')}
-                    className="flex items-center justify-center px-4 text-white bg-[#6c44ff] hover:bg-[#6c44ff]/80 transition-colors rounded-full"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center cursor-pointer dark:hover:bg-[#F2F4F7] dark:hover:text-[#6C48E3] dark:bg-[#6C48E3] dark:text-white h-10 justify-center"
                 >
-                    <MdLaunch size={20} />Launch Course
+                    <MdLaunch size={20} /> Launch Course
                 </button>)}
             </div>
 

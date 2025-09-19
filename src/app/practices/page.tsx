@@ -1,6 +1,6 @@
 
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import PracticeCard from "@/components/PracticeCard";
 import axios, { AxiosError } from 'axios';
 import { MdLaunch, MdSearch } from 'react-icons/md';
@@ -19,17 +19,19 @@ const Practices = () => {
 
     const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
 
-    const fetchPractices = async (query?: string) => {
+    const fetchPractices = async () => {
         try {
             setLoading(true);
             setError(null);
-            if (query?.length === 0) {
-                const response = await axios.get('/api/practices');
-                setPractices(response?.data?.practices);
-            } else {
-                const response = await axios.get(`/api/Practices/search?query=${query}`);
-                setPractices(response?.data?.practices);
-            }
+            // if (query?.length === 0) {
+            //     const response = await axios.get('/api/practices');
+            //     setPractices(response?.data?.practices);
+            // } else {
+            //     const response = await axios.get(`/api/Practices/search?query=${query}`);
+            //     setPractices(response?.data?.practices);
+            // }
+            const response = await axios.get('/api/practices');
+            setPractices(response?.data?.practices);
         } catch (error: unknown) {
             error instanceof AxiosError ? setError(error?.response?.data?.message) : setError("Something went wrong while fetching classrooms");
         } finally {
@@ -38,32 +40,36 @@ const Practices = () => {
     };
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchPractices(query);
-        }, 1000);
+        fetchPractices();
+    }, []);
 
-        return () => clearTimeout(timer);
-    }, [query]);
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         fetchPractices(query);
+    //     }, 1000);
+
+    //     return () => clearTimeout(timer);
+    // }, [query]);
 
     //search needs to be implimented later
-    const search = async () => {
-        try {
-            setError(null);
-            setLoading(true);
-            const response = await axios.get(`/api/practices/search?query=${query}`);
-            setPractices(response?.data?.Practices);
-        } catch (error: unknown) {
-            error instanceof AxiosError ? setError(error?.response?.data?.message) : setError("Something went wrong while fetching classrooms");
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const search = async () => {
+    //     try {
+    //         setError(null);
+    //         setLoading(true);
+    //         const response = await axios.get(`/api/practices/search?query=${query}`);
+    //         setPractices(response?.data?.Practices);
+    //     } catch (error: unknown) {
+    //         error instanceof AxiosError ? setError(error?.response?.data?.message) : setError("Something went wrong while fetching classrooms");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
 
     return !loading && !error ? (
-        <div className="bg-gray-100 dark:bg-gray-800">
+        <div className="bg-gray-100 dark:bg-gray-800 min-h-screen">
             <div className="flex gap-4 justify-space-between items-center w-full max-w-md py-2 px-4">
-                <div className="flex w-full rounded-full shadow-sm border border-gray-300 overflow-hidden bg-[#F2F4F7] focus-within:ring-2 focus-within:ring-gray-500">
+                {/* <div className="flex w-full rounded-full shadow-sm border border-gray-300 overflow-hidden bg-[#F2F4F7] focus-within:ring-2 focus-within:ring-gray-500">
                     <input
                         type="text"
                         placeholder="Search for a Practice..."
@@ -79,10 +85,10 @@ const Practices = () => {
                     </button>
 
 
-                </div>
+                </div> */}
                 {userData.role ==='Admin' &&(<button
                     onClick={() => router.push('/practices/create')}
-                    className="flex items-center justify-center px-4 text-white bg-[#6c44ff] hover:bg-[#6c44ff]/80 transition-colors rounded-full"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center cursor-pointer dark:hover:bg-[#F2F4F7] dark:hover:text-[#6C48E3] dark:bg-[#6C48E3] dark:text-white h-10 justify-center "
                 >
                     <MdLaunch size={20} />Launch Practice
                 </button>)}
@@ -90,7 +96,7 @@ const Practices = () => {
 
             {!loading && !error ? (
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-gray-100 p-4 dark:bg-gray-800 min-h-screen w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-gray-100 p-4 dark:bg-gray-800 w-full">
                     {Practices?.map((Practice: Practice, index: number) => (
                         <div key={index}>
                             <PracticeCard

@@ -98,11 +98,11 @@ export default function Header() {
                 )}
 
                 {/* Desktop Classroom Button */}
-                <div className='hidden md:flex flex-row items-center'>
+             {   userData.role != 'Admin' &&(<div className='hidden md:flex flex-row items-center'>
                     <Link href="/my-classroom" className={`px-4 py-2 rounded-full hover:bg-gray-400 dark:text-[#F2F4F7] bg-gray-300 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-400 cursor-pointer`}>
                         Classroom
                     </Link>
-                </div>
+                </div>)}
 
 
                 <div className='flex flex-row items-center space-x-3'>
@@ -133,7 +133,7 @@ export default function Header() {
                             </div>
                         ))}
 
-                        <Link
+                    <Link
                             href="/my-classroom"
                             className={`px-4 py-2 hover:bg-gray-400 dark:hover:bg-gray-400 rounded-full cursor-pointer`}
                         >
@@ -148,13 +148,6 @@ export default function Header() {
                                 <Link href={item.slug}>{item.name}</Link>
                             </div>
                         ))}
-
-                        <Link
-                            href="/my-classroom"
-                            className={`px-4 py-2 hover:bg-gray-400 dark:hover:bg-gray-400 rounded-full cursor-pointer`}
-                        >
-                            Classroom
-                        </Link>
                     </div>
                 </div>
                 )}

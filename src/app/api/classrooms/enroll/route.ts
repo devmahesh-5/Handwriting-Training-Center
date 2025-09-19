@@ -42,7 +42,7 @@ export async function PATCH(req: NextRequest) {
                 },
                 
                 $set:{
-                    status: "active" 
+                    status: "Active" 
                 }
             },
             {

@@ -26,6 +26,8 @@ interface User {
     profilePicture: string,
     role: string,
     skills?: string[] | null,
+    xps: number,
+    totalClassAttended: number
 }
 
 interface Classroom {
@@ -66,7 +68,8 @@ interface Course {
     practiceSet: PracticeSet,
     createdAt: date,
     updatedAt: date,
-    __v: number
+    __v: number,
+    enrolled: number
 }
 
 interface Payment {
@@ -143,5 +146,74 @@ interface Subscription {
     createdAt: date,
     updatedAt: date,
     __v: number
+}
+
+/*
+const {
+    students = [],
+    teachers = [],
+    classrooms = [],
+    courses = [],
+    subscriptions = [],
+    recentStudents = [],
+    recentTeachers = [],
+    topCourses = [],
+    courseEarning = [],
+    leaderBoard = [],
+    teachersWithClassrooms = []
+  } = dashboardData;
+*/
+
+interface GroupedCourses {
+    _id?: string | null,
+    totalEarning: number
+}
+
+interface teacherWithClassrooms {
+    _id: string,
+    fullName: string,
+    email: string,
+    username: string,
+    googleId: string,
+    isVerified: boolean,
+    refreshToken: string,
+    forgetPasswordToken: string,
+    forgetPasswordTokenExpiry: number,
+    createdAt: date,
+    updatedAt: date,
+    __v: number,
+    otp: string,
+    otpExpiry: number,
+    sessionId:number,
+    unVerified_at: number
+    verificationAttempts: number
+    password: string,
+    address: string,
+    phone: string,
+    gender: string,
+    profilePicture: string,
+    role: string,
+    skills?: string[] | null,
+    xps: number,
+    classrooms: Classroom[]
+}
+interface SubscriptionCount {
+    _id: string,
+    count: number
+}
+
+interface Dashboard {
+    students: User[],
+    teachers: User[],
+    classrooms: Classroom[],
+    courses: Course[],
+    subscriptions: SubscriptionCount[],
+    recentStudents: User[],
+    recentTeachers: User[],
+    topCourses: Course[],
+    courseEarning: GroupedCourses[],
+    leaderBoard: User[],
+    teachersWithClassrooms: any[]
+
 }
 

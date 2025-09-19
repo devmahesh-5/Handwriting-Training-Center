@@ -26,7 +26,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             throw new ApiError(400, "User is not verified");
         }
 
-        if(user.role !== "Student") {
+        if (user.role !== "Student") {
             throw new ApiError(403, "Only students can submit practice solutions");
         }
 
@@ -67,6 +67,17 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
         if (existingSolution) {
             // If a solution already exists, update it
+
+            //clear users previous xp
+            const updatedUser = await User.findByIdAndUpdate(user._id, {
+                $inc: {
+                    xp: -existingSolution.marks
+                }
+            },
+                {
+                    new: true
+                })
+                
             practiceSolution = await StudentSolution.findByIdAndUpdate(existingSolution._id, {
                 submissionFile: uploadedSubmissionFile.secure_url,
                 status: 'Pending', // Reset status to 'Submitted' on resubmission
@@ -75,12 +86,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             }, { new: true });
         } else {
             practiceSolution = await StudentSolution.create({
-            student: user._id,
-            classroom: classroomId,
-            practice: practiceId,
-            submissionFile: uploadedSubmissionFile.secure_url
-        });
-    }
+                student: user._id,
+                classroom: classroomId,
+                practice: practiceId,
+                submissionFile: uploadedSubmissionFile.secure_url
+            });
+        }
 
         return NextResponse.
             json({
@@ -93,7 +104,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     } catch (error: unknown) {
 
         console.error("Error submitting practice solution:", error);
-        
+
         return NextResponse.
             json({
                 message: error instanceof ApiError ? error.message : "Error submitting practice solution",

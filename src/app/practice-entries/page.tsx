@@ -19,17 +19,13 @@ const PracticeEntries = () => {
 
     const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
 
-    const fetchPracticeEntryEntries = async (query?: string) => {
+    const fetchPracticeEntryEntries = async () => {
         try {
             setLoading(true);
             setError(null);
-            if (query?.length === 0) {
-                const response = await axios.get('/api/practice-entry');
-                setPracticeEntries(response?.data?.practiceEntries);
-            } else {
-                const response = await axios.get(`/api/practice-entry/search?query=${query}`);
-                setPracticeEntries(response?.data?.practiceEntries);
-            }
+            const response = await axios.get('/api/practice-entry');
+            setPracticeEntries(response?.data?.practiceEntries);
+
         } catch (error: unknown) {
             error instanceof AxiosError ? setError(error?.response?.data?.message) : setError("Something went wrong while fetching classrooms");
         } finally {
@@ -38,33 +34,29 @@ const PracticeEntries = () => {
     };
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchPracticeEntryEntries(query);
-        }, 1000);
-
-        return () => clearTimeout(timer);
-    }, [query]);
+        fetchPracticeEntryEntries();
+    }, []);
 
 
 
     //search needs to be implimented later
-    const search = async () => {
-        try {
-            setError(null);
-            setLoading(true);
-            const response = await axios.get(`/api/PracticeEntryEntries/search?query=${query}`);
-            setPracticeEntries(response?.data?.PracticeEntryEntries);
-        } catch (error: unknown) {
-            error instanceof AxiosError ? setError(error?.response?.data?.message) : setError("Something went wrong while fetching classrooms");
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const search = async () => {
+    //     try {
+    //         setError(null);
+    //         setLoading(true);
+    //         const response = await axios.get(`/api/PracticeEntryEntries/search?query=${query}`);
+    //         setPracticeEntries(response?.data?.PracticeEntryEntries);
+    //     } catch (error: unknown) {
+    //         error instanceof AxiosError ? setError(error?.response?.data?.message) : setError("Something went wrong while fetching classrooms");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     return !loading && !error ? (
-        <div className="bg-gray-100 dark:bg-gray-800">
+        <div className="bg-gray-100 dark:bg-gray-800 dark:text-white min-h-screen">
             <div className="flex gap-4 justify-space-between items-center w-full max-w-md py-2 px-4">
-                <div className="flex w-full rounded-full shadow-sm border border-gray-300 overflow-hidden bg-[#F2F4F7] focus-within:ring-2 focus-within:ring-gray-500">
+                {/* <div className="flex w-full rounded-full shadow-sm border border-gray-300 overflow-hidden bg-[#F2F4F7] focus-within:ring-2 focus-within:ring-gray-500">
                     <input
                         type="text"
                         placeholder="Search for a PracticeEntry..."
@@ -80,10 +72,10 @@ const PracticeEntries = () => {
                     </button>
 
 
-                </div>
-                {userData.role ==='Admin' &&(<button
+                </div> */}
+                {userData.role === 'Admin' && (<button
                     onClick={() => router.push('/practice-entries/create')}
-                    className="flex items-center justify-center px-4 text-white bg-[#6c44ff] hover:bg-[#6c44ff]/80 transition-colors rounded-full"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center cursor-pointer dark:hover:bg-[#F2F4F7] dark:hover:text-[#6C48E3] dark:bg-[#6C48E3] dark:text-white h-10 justify-center "
                 >
                     <MdLaunch size={20} />Create a new PracticeEntry
                 </button>)}
@@ -91,7 +83,7 @@ const PracticeEntries = () => {
 
             {!loading && !error ? (
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-gray-100 p-4 dark:bg-gray-800 min-h-screen w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-gray-100 p-4 dark:bg-gray-800 w-full">
                     {PracticeEntries?.map((PracticeEntry: PracticeEntry, index: number) => (
                         <div key={index}>
                             <PracticeEntryCard
@@ -99,7 +91,7 @@ const PracticeEntries = () => {
                                 day={PracticeEntry?.day}
                                 practice={PracticeEntry?.practice}
                                 status={PracticeEntry?.status}
-                                title = {PracticeEntry?.title}
+                                title={PracticeEntry?.title}
                             />
                         </div>
                     ))}
@@ -132,9 +124,9 @@ const PracticeEntries = () => {
                 </div>
             )}
         </div>
-    ):!error?(
+    ) : !error ? (
         <Loading message={"Fetching PracticeEntries..."} />
-    ):(
+    ) : (
         <div className="flex flex-col gap-4 bg-gray-100 p-4 dark:bg-gray-800 min-h-screen">
             <p className="text-red-500">{error}</p>
         </div>

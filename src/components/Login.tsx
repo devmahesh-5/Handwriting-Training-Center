@@ -11,6 +11,8 @@ import Input from '@/components/Input';
 import { useDispatch } from 'react-redux';
 import { login, logout } from '@/store/authSlice';
 import Loading from '@/components/Loading';
+import { userData } from '@/interfaces/interfaces';
+
 type LoginFormFields = {
   email: string;
   password: string;
@@ -41,7 +43,12 @@ export default function LoginPage() {
       }else{
         dispatch(logout());
       }
-      router.push('/home');
+      
+      if(userData?.data?.user?.role ==='Admin'){
+        router.push('/dashboard');
+      }else{
+        router.push('/home');
+      }
 
       toast.success("User SignIn successful");
     } catch (error: unknown) {

@@ -78,6 +78,14 @@ const userSchema = new mongoose.Schema({
     skills: {
         type: [String],
         default: []
+    },
+    xps: {
+        type: Number,
+        default: 0
+    },
+    totalClassAttended: {
+        type: Number,
+        default: 0
     }
 },{ timestamps: true });
 
