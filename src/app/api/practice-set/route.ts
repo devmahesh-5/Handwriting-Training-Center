@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
             throw new ApiError(404, "User not found")
         }
 
-        if (user.isVerified === false || user.role !== "admin") {
+        if (user.isVerified === false || user.role !== "Admin") {
             throw new ApiError(400, "User not authorized to make practice set")
         }
 

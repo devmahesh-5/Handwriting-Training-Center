@@ -59,8 +59,6 @@ const PracticeSetPage = ({params}:{params:Promise<{id:string}>}) => {
         return <Loading message={"Loading practice entries..."} />;
     }
 
-    if(!practiceSet) return null;
-
    return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-800 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -154,6 +152,8 @@ const PracticeSetPage = ({params}:{params:Promise<{id:string}>}) => {
                         </svg>
                         Add New Entry
                     </button>
+
+                    
 
                     {/* <button
                         onClick={() => router.push(`/practice-set/${id}/edit`)}

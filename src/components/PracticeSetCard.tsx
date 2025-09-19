@@ -15,7 +15,7 @@ function PracticeSetCard(props: Props) {
     const { title, description, practiceEntry, createdAt, updatedAt, _id } = props;
     
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-6">
                 {/* Header */}
                 <div className="flex justify-between items-start mb-4">
