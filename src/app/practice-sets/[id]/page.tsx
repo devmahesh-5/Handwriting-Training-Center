@@ -182,6 +182,7 @@ const PracticeSetPage = ({params}:{params:Promise<{id:string}>}) => {
                                         practiceSetId={id}
                                         isInSet = {false}
                                         refresh={fetchPracticeSet}
+                                        title={entry.title}
                                     />
                                 ))}
                             </div>

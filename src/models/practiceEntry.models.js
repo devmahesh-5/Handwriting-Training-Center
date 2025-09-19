@@ -8,16 +8,20 @@ const practiceEntrySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum:["locked","active","completed"],
-      default:"locked"
+      enum:["Locked",'Unlocked'],
+      default:"Locked"
     },
     day: {
       type: Number,
-      default: 0,
+      required: true,
     },
     totalMarks: {
       type: Number,
       default: 0,
+    },
+    title : {
+      type: String,
+      required: true
     }
   },
   {timestamps:true} 

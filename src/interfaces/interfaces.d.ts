@@ -111,6 +111,7 @@ interface Practice {
 
 
 interface PracticeEntry {
+    title: string,
     _id: string,
     practice: Practice,
     status: string,

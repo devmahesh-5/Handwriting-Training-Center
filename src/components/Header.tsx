@@ -15,6 +15,7 @@ export default function Header() {
     const pathname = usePathname();
     const authStatus = useSelector((state: { auth: { status: boolean; userData: userData; } }) => state.auth.status);
     const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
+    const [admin, setAdmin] = useState(userData?.role === 'Admin');
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
@@ -26,10 +27,12 @@ export default function Header() {
     ];
 
     const adminNavItems = [
-        { name: 'Dashboard', slug: '/dashboard', active: authStatus },
-        { name: 'Courses', slug: '/courses', active: authStatus },
-        { name: 'Sets', slug: '/practice-sets', active: authStatus },
-        { name: 'Subscription', slug: '/subscriptions', active: authStatus },
+        { name: 'Dashboard', slug: '/dashboard', active: admin },
+        { name: 'Courses', slug: '/courses', active: admin },
+        { name: 'Sets', slug: '/practice-sets', active: admin },
+        { name: 'Subscription', slug: '/subscriptions', active: admin },
+        {name:'Practice',slug:'/practices',active:admin},
+        {name:'Entry',slug:'/practice-entries',active:admin},
     ];
 
     useEffect(() => {

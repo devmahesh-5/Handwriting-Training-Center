@@ -23,7 +23,7 @@ interface Props {
 function PracticeEntryCard(props: Props) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { classroomId, _id, status, day, practice, practiceSetId, isInSet, refresh } = props;
+    const { classroomId, _id, status, day, practice, practiceSetId, isInSet, refresh,title } = props;
     const router = useRouter();
     const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
 
@@ -85,7 +85,7 @@ function PracticeEntryCard(props: Props) {
                 </div>
                 <div className="flex-1">
                     <h3 className="font-medium text-gray-900 dark:text-white">
-                        Day {day}: {practice?.title}
+                        Day {day}: {title}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                         {practice?.instruction}
@@ -125,6 +125,19 @@ function PracticeEntryCard(props: Props) {
                                 }}
                             >
                                 {isInSet ? 'Remove' : 'Add'}
+                            </button>
+                        )
+                    }
+
+                    {
+                        userData?.role === 'Admin' && (!practiceSetId) && (
+                            <button
+                                className="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white mt-4"
+                                onClick={() => {
+                                    router.push(`/practice-entries/${_id}`);
+                                }}
+                            >
+                                View
                             </button>
                         )
                     }

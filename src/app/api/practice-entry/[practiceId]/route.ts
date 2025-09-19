@@ -9,8 +9,7 @@ connectDB();
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ practiceId: string }> }) {
     try {
-        
-        const {day} = await request.json();
+        const {day,title} = await request.json();
         const { practiceId } = await params;
         const practice = await Practice.findById(practiceId);
 
@@ -21,7 +20,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const totalMarks = practice.xp;
         
 
-        if (!day || !totalMarks || !practiceId) {
+        if (!day || !totalMarks || !practiceId || !title) {
             throw new ApiError(400, "All fields are required");
         }
 
@@ -38,7 +37,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const practiceEntry = await PracticeEntry.create({
             practice: practiceId,
             day,
-            totalMarks
+            totalMarks,
+            title
         });
 
         if(!practiceEntry) {

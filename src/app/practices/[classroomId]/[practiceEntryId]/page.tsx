@@ -163,7 +163,7 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
         <div className="bg-[#F2F4F7] rounded-lg shadow-md p-6 mb-6 dark:bg-gray-800 dark:text-[#F2F4F7]">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-[#F2F4F7]">{practiceEntry?.practice?.title}</h1>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-[#F2F4F7]">{practiceEntry?.title || "Practice Entry"}</h1>
               <div className="flex items-center mt-2 space-x-4">
                 <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
                   Day {practiceEntry?.day}
