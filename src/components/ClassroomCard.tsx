@@ -1,8 +1,9 @@
 'use client'
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { userData } from '@/interfaces/interfaces';
+import axios from 'axios';
 interface Teacher {
   fullName: string;
   profilePicture?: string;
@@ -18,7 +19,6 @@ interface Props {
   id?: string;
   title: string;
   xp: number;
-  currentXp?: number | null;
   duration: string;
   course: Course;
   description?: string;
@@ -30,17 +30,30 @@ function ClassroomCard(props: Props) {
     const {
         id,
         title,
-        currentXp = 0,
         xp,
         duration,
         course,
         description,
         teacher,
         status,
-    }= props
-    console.log(currentXp, xp)
-     const progressPercentage = Math.min(Math.round((currentXp ?? 0 / xp) * 100), 100);
-   
+    }= props;
+
+    const [currentXp, setCurrentXp] = useState(0);
+    // console.log(xp, currentXp);
+    
+    const fetchMyXp = async () => {
+        try {
+          const response = await axios.get(`/api/practice-solution/my-solution/${id}`);
+          setCurrentXp(response?.data?.solutions[0]?.currentMarks);
+        } catch (error) {
+          console.error('Error fetching my xp:', error);
+        }
+    }
+    useEffect(() => {
+        fetchMyXp();
+      },[id])
+     const progressPercentage = Math.min(Math.round((currentXp / Number(xp)) * 100), 100);
+  
     const router = useRouter();
 
     const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);

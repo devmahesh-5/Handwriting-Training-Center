@@ -68,17 +68,12 @@ function DashboardPage() {
 
   const [userClassrooms, setUserClassrooms] = useState<Classroom | null>();
   const [userCourses, setUserCourses] = useState<Course | null>();
-  const [currentMarks, setCurrentMarks] = useState<number | null>(null);
   const [leaderBoard, setLeaderBoard] = useState<User[] | null>(null);
   
   const fetchUserClassrooms = async () => {
     try {
       setLoading(true);
       const response = await axios.get('/api/classrooms/get-my-classroom');
-      if(response){
-        const currentMark = await axios.get(`/api/practice-solution/my-solution/${response?.data?.classroom?.[0]?._id}`);
-        setCurrentMarks(currentMark?.data?.solutions[0]?.currentMarks);
-      }
       return response?.data?.classroom?.[0];
 
     } catch (error: unknown) {
@@ -199,7 +194,6 @@ function DashboardPage() {
         <ClassroomCard
           id={userClassrooms?._id}
           title={userClassrooms?.name || "Unknown Classroom"}
-          currentXp={currentMarks }
           status={userClassrooms?.status || "Pending"}
           xp={userClassrooms?.totalXp || 100}
           duration={userClassrooms?.course?.duration || "N/A"}

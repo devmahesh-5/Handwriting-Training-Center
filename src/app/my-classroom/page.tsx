@@ -39,11 +39,11 @@ const MyClassrooms = () => {
             <main className="max-w-7xl mx-auto px-4 py-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {classrooms?.map((classroom: Classroom) => (
+                        
                         <ClassroomCard
                             key={classroom._id}
                             id={classroom._id}
                             title={classroom.name || "Unknown Classroom"}
-                            currentXp={classroom?.totalXp || 10}
                             status={classroom?.status || "Pending"}
                             xp={classroom?.totalXp || 100}
                             duration={classroom?.course?.duration || "N/A"}
