@@ -75,7 +75,7 @@ const Subscriptions = () => {
 
     return !loading && !error ? (
         <div className="flex flex-col gap-4 bg-gray-100 p-4 dark:bg-gray-800 min-h-screen w-full">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">SSubscriptions</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Subscriptions</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {subscriptions?.map((subscription) => (
                     <div key={subscription._id}>

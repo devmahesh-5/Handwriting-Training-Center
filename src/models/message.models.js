@@ -6,18 +6,12 @@ const messageSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    receiver: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+    roomId: {
+        type: String,
         required: true
     },
     message: {
         type: String,
-        required: true
-    },
-    isRead: {
-        type: Boolean,
-        default: false
     },
     messageFiles:[
         {
@@ -26,5 +20,5 @@ const messageSchema = new mongoose.Schema({
     ]
 },{timestamps : true});
 
-const Message = mongoose.model('Message', messageSchema);
+const Message = mongoose.models.Message || mongoose.model('Message', messageSchema);
 export default Message

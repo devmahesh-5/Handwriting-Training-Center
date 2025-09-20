@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import PracticeEntryCard from '@/components/PracticeEntryCard';
 import Loading from '@/components/Loading';
 import { Classroom, userData, PracticeEntry } from '@/interfaces/interfaces';
+import ChatRoom from '@/components/MessageCard';
 
 const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [classroom, setClassroom] = useState<Classroom | null>(null);
@@ -16,6 +17,8 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [error, setError] = useState(null);
     const Router = useRouter();
     const userData = useSelector((state: { auth: { status: boolean; userData: userData; }; }) => state.auth.userData);
+
+    const [isChatRoomActive, setIsChatRoomActive] = useState(false);
 
     const { id } = React.use(params);
 
@@ -79,7 +82,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     }
                 </div>
                 <div className="flex items-center space-x-4 mr-4">
-                    <button>
+                    <button onClick={() => setIsChatRoomActive(prev=>!prev)}>
                         <MdMessage className="text-2xl text-[#6c30d0] w-8 h-8 cursor-pointer" />
 
                     </button>
@@ -97,6 +100,13 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
                 </div>
 
+            </div>
+            <div className="max-w-7xl mx-auto">
+                {
+                    isChatRoomActive && (
+                        <ChatRoom roomId={classroom?._id} currentUser={userData} />
+                    )
+                }
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mb-8">

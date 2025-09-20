@@ -10,7 +10,7 @@ import { ApiError } from "@/utils/ApiError";
 connectDB();
 
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ receiverId: string }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ roomId: string }> }) {
 
     try {
         const user = await getDataFromToken(req);
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rec
             throw new ApiError(401, "User is not verified");
         }
 
-        const receiverId = (await params).receiverId;
+        const roomId = (await params).roomId;
 
         const formData = await req.formData();
         const message = formData.get('message') as string;
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rec
         const newMessage = await Messages.create(
             {
                 sender: user?._id,
-                receiver: receiverId,
+                receiver: roomId,
                 message,
                 messageFile: uploadedmessageFile?.secure_url
             });
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rec
     }
 }
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ receiverId: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ roomId: string }> }) {
     try {
         const user = await getDataFromToken(req);//it is the middleware to check if the user is logged in
         if (!user) {
@@ -76,23 +76,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rece
         if (user.isVerified === false) {
             throw new ApiError(401, "User is not verified");
         }
-        const sender = user?._id;
-        const receiver = (await params).receiverId;
-        const { searchParams } = new URL(req.url);
-        const limit = searchParams.get('limit') || 10;
 
-        if (!isValidObjectId(sender) || !isValidObjectId(receiver)) {
-            throw new Error('Invalid user id');
-        }
+        const roomId = (await params).roomId;
         //lets change
         let messages = await Messages.aggregate(
             [
                 {
                     $match: {
-                        $or: [
-                            { sender: new mongoose.Types.ObjectId(sender), receiver: new mongoose.Types.ObjectId(receiver) },
-                            { sender: new mongoose.Types.ObjectId(receiver), receiver: new mongoose.Types.ObjectId(sender) }
-                        ]
+                        roomId : roomId,
                     }
                 },
                 {
@@ -104,6 +95,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rece
                         pipeline: [
                             {
                                 $project: {
+                                    _id: 1,
                                     fullName: 1,
                                     profilePicture: 1
                                 }
@@ -112,86 +104,28 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rece
                     }
                 },
                 {
-                    $lookup: {
-                        from: 'users',
-                        localField: 'receiver',
-                        foreignField: '_id',
-                        as: 'receiver',
-                        pipeline: [
-                            {
-                                $project: {
-                                    fullName: 1,
-                                    avatar: 1
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
                     $addFields: {
-                        sender: { $arrayElemAt: ['$sender', 0] },
-                        receiver: { $arrayElemAt: ['$receiver', 0] }
+                        sender: { $arrayElemAt: ['$sender', 0] }
                     }
                 },
                 {
                     $sort: {
-                        createdAt: -1
+                        createdAt: 1
                     }
-                },
-
-                // {
-                //     $skip: (Number(page) - 1) * Number(limit)
-                // },
-                {
-                    $limit: Number(limit)
                 },
 
                 {
                     $project: {
                         sender: 1,
-                        receiver: 1,
+                        roomId: 1,
                         message: 1,
                         createdAt: 1,
                         messageFiles: 1,
-                        isRead: 1
                     }
                 }
             ]
         )
 
-        messages = messages.reverse();
-
-        const messageCount = await Messages.countDocuments({
-            $or: [
-                { sender: new mongoose.Types.ObjectId(sender), receiver: new mongoose.Types.ObjectId(receiver) },
-                { sender: new mongoose.Types.ObjectId(receiver), receiver: new mongoose.Types.ObjectId(sender) }
-            ]
-        })
-
-        const updatedMessages = await Messages.updateMany({
-            $or: [
-                { sender: new mongoose.Types.ObjectId(sender), receiver: new mongoose.Types.ObjectId(receiver) },
-                { sender: new mongoose.Types.ObjectId(receiver), receiver: new mongoose.Types.ObjectId(sender) },
-            ]
-        },
-            {
-                $set: {
-                    isRead: true
-                }
-            },
-            {
-                new: true
-            }
-        )
-
-        // console.log(updatedMessages);
-
-        if (!updatedMessages) {
-            throw new ApiError(
-                500,
-                'could not mark messages as read'
-            )
-        }
 
         if (!messages) {
             throw new ApiError(500, 'Failed to get messages');
@@ -200,7 +134,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rece
         return NextResponse.
             json({
                 message: "Messages fetched successfully",
-                messages, messageCount
+                messages
             }, {
                 status: 200
             });
