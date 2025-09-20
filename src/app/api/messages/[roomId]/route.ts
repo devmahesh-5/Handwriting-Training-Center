@@ -79,7 +79,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ room
 
         const roomId = (await params).roomId;
         //lets change
-        let messages = await Messages.aggregate(
+        const messages = await Messages.aggregate(
             [
                 {
                     $match: {
