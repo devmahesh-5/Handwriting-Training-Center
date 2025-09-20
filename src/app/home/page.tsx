@@ -112,6 +112,7 @@ function DashboardPage() {
     }
   }
 
+
   useEffect(() => {
     ; (
       async () => {
@@ -130,6 +131,7 @@ function DashboardPage() {
     )();
 
   }, [authStatus]);
+
 
   //remember to add course to classroom
   return !loading ? (
@@ -151,7 +153,8 @@ function DashboardPage() {
           skills={userData?.skills || []}
         />
 
-
+         <div className=''>
+        <h2 className='text-2xl font-semibold mb-4 bg-gray-100 dark:bg-gray-800 p-3'>Latest Course</h2>
         <CourseCard
           _id={userCourses?._id}
           title={userCourses?.name || "N/A"}
@@ -160,6 +163,8 @@ function DashboardPage() {
           thumbnail={userCourses?.thumbnail || '/course.png'}
           isNew={true}
         />
+        </div>
+
         <div className='flex flex-col row-span-2 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden'>
          <h2 className='text-2xl font-semibold mb-4 bg-gray-100 dark:bg-gray-800 p-3'>Leaderboard</h2>
         {
@@ -190,8 +195,9 @@ function DashboardPage() {
         }
 
         </div>
+        
 
-        <ClassroomCard
+        {userClassrooms && (<ClassroomCard
           id={userClassrooms?._id}
           title={userClassrooms?.name || "Unknown Classroom"}
           status={userClassrooms?.status || "Pending"}
@@ -200,7 +206,7 @@ function DashboardPage() {
           description={userClassrooms?.description || "N/A"}
           course={userClassrooms?.course || { name: "N/A", duration: "N/A", thumbnail: "/course.png" }}
           teacher={userClassrooms?.teacher || { fullName: "N/A", profilePicture: "/profile.png" }}
-        />
+        />)}
 
 
 

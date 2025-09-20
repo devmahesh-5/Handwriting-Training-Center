@@ -54,7 +54,7 @@ export default function CourseDetailPage() {
   const [loadingPracticeset, setLoadingPracticeset] = useState<boolean>(false);
   const [errorPracticeset, setErrorPracticeset] = useState<string | null>(null);
   const [isPracticeSetActive, setIsPracticeSetActive] = useState(false);
-
+  const [msg, setMsg] = useState<string>('Loading Course Details...');
   useEffect(() => {
     // Create preview when file is selected
     if (paymentProof && paymentProof.length > 0) {
@@ -97,10 +97,10 @@ export default function CourseDetailPage() {
 
   const subscribe = async(data: submissionData) => {
     try {
+      setMsg('Subscribing...');
       setLoading(true);
       setError(null);
       const formData = new FormData();
-  
       if (data?.paymentProof && data.paymentProof?.length > 0) {
         formData.append('paymentProof', data.paymentProof[0]);
       }
@@ -111,7 +111,7 @@ export default function CourseDetailPage() {
       setError(error instanceof AxiosError ? error.response?.data?.message : "Upload failed. Please try again.");
     } finally {
       setLoading(false);
-      
+      setMsg('Loading Course Details...');
     }
 
     
@@ -154,7 +154,7 @@ export default function CourseDetailPage() {
 
   if (loading) {
     return (
-      <Loading message="Loading course details..." />
+      <Loading message={msg} />
     );
   }
 
@@ -315,8 +315,8 @@ export default function CourseDetailPage() {
                 </div>
               ):success && (
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-white">
-                    Payment for {course.name} is uploaded.We will assign you a tutor soon.
+                  <h1 className="text-2xl font-bold text-green-500 mb-2">
+                    Payment for <strong className="text-[#6C48E3]">{course.name}</strong>  is uploaded.We will assign you a tutor soon.
                   </h1>
                   </div>
               )

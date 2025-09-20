@@ -34,6 +34,7 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [practiceId, setPracticeId] = useState<string | null>(null);
   const [practiceEntry, setPracticeEntry] = useState<PracticeEntry | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'instructions' | 'reference' | 'video'>('instructions');
@@ -46,12 +47,15 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
 
   const [solutionLoading, setSolutionLoading] = useState(false);
 
-  const fetchSolutions = async (practiceId: string) => {
+
+  const fetchSolutions = async (practiceId?: string) => {
     try {
       setError(null);
+
       setSolutionLoading(true);
       const response = await axios.get(`/api/practice-solution/students/${classroomId}?practiceId=${practiceId}`);
       setPracticeSolutions(response?.data?.solutions);
+      
     } catch (error: unknown) {
       error instanceof AxiosError
         ? setError(error?.response?.data?.message)
@@ -61,7 +65,7 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
     }
   }
 
-  const fetchMySolution = async (practiceId: string) => {
+  const fetchMySolution = async (practiceId?: string) => {
     try {
       setError(null);
       setSolutionLoading(true);
@@ -81,8 +85,7 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
     }
   }
 
-  useEffect(() => {
-    (async () => {
+  const fetchPracticeEntry = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -92,11 +95,11 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
 
         // Get the practice ID from the response data directly
         const practiceId = practiceEntryData?.practice?._id;
-
+        setPracticeId(practiceId);
         if (practiceId && userData?.role) {
-          if (userData.role === 'Teacher') {
+          if (userData?.role === 'Teacher') {
             await fetchSolutions(practiceId);
-          } else if (userData.role === 'Student') {
+          } else if (userData?.role === 'Student') {
             await fetchMySolution(practiceId);
           }
         } else {
@@ -109,7 +112,12 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
       } finally {
         setLoading(false);
       }
-    })();
+    }
+
+  useEffect(() => {
+    if (practiceEntryId) {
+      fetchPracticeEntry();
+    }
   }, [practiceEntryId]);
 
 
@@ -143,7 +151,9 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
 
       const response = await axios.post(`/api/practice-solution/submit/${classroomId}/${practiceEntry?.practice?._id}`, submissionData);
 
-      toast.success("Practice submitted successfully!");
+      if (response) {
+        await fetchMySolution(practiceEntry?.practice?._id);
+      }
       // router.push('/practices');
 
     } catch (error: unknown) {
@@ -428,7 +438,7 @@ const PracticePage = ({ params }: { params: Promise<{ practiceEntryId: string, c
                       </div>
                     </div>
                   </div>
-                </div>):userData.role === 'student' && error && (
+                </div>):userData?.role === 'Student' && error && (
                   <div className="flex items-center justify-center">
                   <span className="ml-2 text-red-600 dark:text-red-400">{error}</span>
                 </div>

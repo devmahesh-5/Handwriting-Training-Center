@@ -49,9 +49,15 @@ function ClassroomCard(props: Props) {
           console.error('Error fetching my xp:', error);
         }
     }
+    
     useEffect(() => {
+      if(userData.role === 'Student'){
         fetchMyXp();
+      }else{
+        return
+      }
       },[id])
+      // console.log(currentXp);
      const progressPercentage = Math.min(Math.round((currentXp / Number(xp)) * 100), 100);
   
     const router = useRouter();
@@ -112,13 +118,13 @@ function ClassroomCard(props: Props) {
         {/* Footer with metadata */}
         <div className="mt-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+            {userData?.role === 'Student' && (<div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
               <span className="mr-1.5">🌟</span>
               <span>
                 <span className="font-medium">{currentXp}</span>/
                 <span className="text-gray-500 dark:text-gray-400">{xp} XP</span>
               </span>
-            </div>
+            </div>)}
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
               <span className="mr-1.5">⏱️</span>
               {duration}

@@ -24,14 +24,12 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const date = new Date().getHours();
 
-    useEffect(() => {
-        ; (
-            async () => {
+    const fetchClassroomData = async () => {
                 try {
 
                     setLoading(true);
                     const response = await axios.get(`/api/classrooms/${id}`);
-                    //console.log("Classroom Response:", response.data);
+                    // console.log("Classroom Response:", response.data);
 
                     setClassroom(response.data.classroom[0]);
                     setLoading(false);
@@ -43,10 +41,10 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     setLoading(false);
                 }
             }
-        )();
 
-
-    }, []);
+    useEffect(() => {
+        fetchClassroomData();
+    }, [id]);
 
     const startWhiteboard = async () => {
         try {
@@ -87,8 +85,8 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
 
     const handleTeacherActive = ()=>{
-        setIsTeacherActive(!isTeacherActive);
-        router.refresh();
+        setIsTeacherActive((prev) => !prev);
+        fetchClassroomData();
     }
 
 
@@ -169,7 +167,7 @@ const ClassroomPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         ):(!classroom?.teacher && userData?.role === 'Admin') ?(
                             <button 
                             onClick={getTeacher}
-                            className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-[#082845] hover:text-white dark:hover:bg-gray-800 dark:text-white cursor-pointer">
+                            className="px-6 py-3 border border-blue-600 rounded-xl hover:bg-gray-200 hover-text-blue-600 dark:hover:bg-gray-800 dark:text-white cursor-pointer">
                             Assign Teacher
                             </button>
                         ):(

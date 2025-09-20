@@ -36,7 +36,7 @@ const Submission = ({
     const [marks, setMarks] = useState<number | 0>(0);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-
+    const [success, setSuccess] = useState<boolean>(false);
     const submitEvaluation = async() => {
         try {
             setLoading(true);
@@ -46,6 +46,8 @@ const Submission = ({
                 feedback,
                 marks,
             });
+
+            setSuccess(true);
             
         } catch (error: unknown) {
             (error instanceof AxiosError )? setError(error.response?.data.message) : setError("An unexpected error occurred");
@@ -54,7 +56,7 @@ const Submission = ({
         }
     }
 
-    return (
+    return !success?(
         <div
                 key={_id}
                 className={`bg-[#F2F4F7] dark:bg-gray-800 dark:text-[#F2F4F7] rounded-xl shadow-md overflow-hidden ${
@@ -165,7 +167,7 @@ const Submission = ({
               </div>
             </div>
           ) : (
-            status === 'pending' && role === 'Teacher' && (
+            status === 'Pending' && role === 'Teacher' && (
               <div className="bg-white rounded-lg border border-gray-200 p-4 dark:bg-gray-800 dark:border-gray-700">
                 <form className="space-y-4">
                   <div>
@@ -228,6 +230,10 @@ const Submission = ({
                 </div>
         
               </div>
+    ):(
+        <div className="flex items-center justify-center mt-6">
+        <span className="ml-2 text-green-600">Your Evaluation is Submitted.Refresh to see it</span>
+      </div>
     )
 
 }

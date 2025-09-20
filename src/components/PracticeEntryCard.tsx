@@ -63,7 +63,6 @@ function PracticeEntryCard(props: Props) {
         return <div className='text-center text-gray-500 dark:text-gray-400'>{isInSet ? 'Removing...' : 'Adding...'}</div>
     }
 
-
     return (
         <div
             key={_id}
@@ -100,22 +99,18 @@ function PracticeEntryCard(props: Props) {
                     </div>
                 </div>
                 <div className="flex items-center">
-                    {userData?.role === 'Student' && (<button
-                        // className={`px-4 py-2 rounded-md text-sm font-medium ${status === 'locked'
-                        //     ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed':
-                        //     'bg-indigo-600 hover:bg-indigo-700 text-white'
-                        //     }`}
-                        // disabled={status === 'locked'}
-                        className="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white"
-                        onClick={() => { `/practices/${classroomId}/${_id}` }}
+                    {(userData?.role === 'Student' || userData?.role === 'Teacher') && (
+                        <button
+                        className="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer mt-4"
+                        onClick={() => { router.push(`/practices/${classroomId}/${_id}`) }}
                     >
                         {/* {status === 'locked' ? 'Locked' : 'Solve Now'} */}
-                        Solve Now
+                        {userData?.role === 'Teacher' ? 'View' : 'Solve Now'}
                     </button>)}
                     {
                         userData?.role === 'Admin' && practiceSetId && (
                             <button
-                                className={`px-4 py-2 rounded-md text-sm font-medium ${isInSet ? 'bg-red-600 hover:bg-red-800 text-white' : 'bg-green-600 hover:bg-green-800'} text-white pointer-cursor mt-4`}
+                                className={`px-4 py-2 rounded-md text-sm font-medium ${isInSet ? 'bg-red-600 hover:bg-red-800 text-white' : 'bg-green-600 hover:bg-green-800'} text-white cursor-pointer mt-4`}
                                 onClick={() => {
                                     if (isInSet) {
                                         RemoveFromPracticeSet();
@@ -132,7 +127,7 @@ function PracticeEntryCard(props: Props) {
                     {
                         userData?.role === 'Admin' && (!practiceSetId) && (
                             <button
-                                className="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white mt-4"
+                                className="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white mt-4 cursor-pointer"
                                 onClick={() => {
                                     router.push(`/practice-entries/${_id}`);
                                 }}

@@ -47,29 +47,53 @@ export async function GET(req: NextRequest) {
                         as: "teacher"
                     }
                 },
-                
+
                 {
                     $lookup: {
                         from: "courses",
                         localField: "course",
                         foreignField: "_id",
-                        as: "course"
-                    }
-                },
-                {
-                    $lookup: {
-                        from: "courses",
-                        localField: "course",
-                        foreignField: "_id",
-                        as: "course"
-                    }
-                },
-                {
-                    $lookup: {
-                        from: "payments",
-                        localField: "payment",
-                        foreignField: "_id",
-                        as: "payment"
+                        as: "course",
+                        pipeline: [
+                            {
+                                $lookup: {
+                                    from: "practicesets",
+                                    localField: "practiceSet",
+                                    foreignField: "_id",
+                                    as: "practiceSet",
+                                    pipeline: [
+                                        {
+                                            $lookup: {
+                                                from: "practiceentries",
+                                                localField: "practiceEntry",
+                                                foreignField: "_id",
+                                                as: "practiceEntries",
+                                                pipeline: [
+                                                    {
+                                                        $lookup: {
+                                                            from: "practices",
+                                                            localField: "practice",
+                                                            foreignField: "_id",
+                                                            as: "practice"
+                                                        }
+                                                    },
+                                                    {
+                                                        $addFields: {
+                                                            practice: { $first: "$practice" }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                $addFields: {
+                                    practiceSet: { $first: "$practiceSet" }
+                                }
+                            }
+                        ]
                     }
                 },
                 {
@@ -81,54 +105,18 @@ export async function GET(req: NextRequest) {
                     }
                 },
                 {
-                    $lookup: {
-                        from: "practicesets",
-                        localField: "practiceSet",
-                        foreignField: "_id",
-                        as: "practiceSet",
-                        pipeline: [
-                            {
-                                $lookup: {
-                                    from: "practiceentries",
-                                    localField: "practiceEntry",
-                                    foreignField: "_id",
-                                    as: "practiceEntries",
-                                    pipeline: [
-                                        {
-                                            $lookup: {
-                                                from: "practices",
-                                                localField: "practice",
-                                                foreignField: "_id",
-                                                as: "practice"
-                                            }
-                                        },
-                                        {
-                                            $addFields: {
-                                                practice: { $first: "$practice" }
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
                     $addFields: {
-                        practiceSet: { $first: "$practiceSet" },
                         course: { $first: "$course" },
                         payment: { $first: "$payment" },
                         subscription: { $first: "$subscription" },
                         teacher: { $first: "$teacher" },
-
-
                     }
                 },
                 {
                     $addFields: {
-                        "totalXp":{
+                        "totalXp": {
                             $reduce: {
-                                input: "$practiceSet.practiceEntries",
+                                input: "$course.practiceSet.practiceEntries",
                                 initialValue: 0,
                                 in: { $add: ["$$value", "$$this.totalMarks"] }
                             }
@@ -146,10 +134,10 @@ export async function GET(req: NextRequest) {
                         createdAt: -1
                     }
                 }
-                
+
 
             ]
-        )
+        );
 
        // console.log("Classroom Data:", classroom);
         

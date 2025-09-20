@@ -4,7 +4,19 @@ import { useRouter } from 'next/navigation';
 import axios, { AxiosError } from 'axios';
 import SubscriptionCard from '@/components/SubscriptionCard';
 import Loading from '@/components/Loading';
-import { Subscription } from '@/interfaces/interfaces';
+import { Course, User } from '@/interfaces/interfaces';
+
+interface Subscription {
+    _id: string,
+    student: User,
+    classroom?: [string] | null,
+    paymentProof: string,
+    status: string,
+    course: Course,
+    createdAt: Date,
+    updatedAt: Date,
+    __v: number
+}
 
 const MySubscription = () => {
     const [subscriptions, setSubscriptions] = useState<Subscription[] | null>(null);
@@ -58,13 +70,14 @@ const MySubscription = () => {
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Subscriptions</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {subscriptions?.map((subscription) => (
+                    console.log("class", subscription),
                     <div key={subscription._id}>
                         <SubscriptionCard 
                             _id={subscription._id}
                             course={subscription.course}
                             student={subscription.student}
                             paymentProof={subscription.paymentProof}
-                            classroom={subscription?.classroom ? subscription.classroom._id : null}
+                            classroom={subscription?.classroom?.[0] || null}
                             status={subscription.status}
                             requestedAt={subscription.createdAt}
                             updatedAt={subscription.updatedAt}

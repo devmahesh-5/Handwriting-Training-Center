@@ -5,6 +5,7 @@ import getDataFromToken from "@/helpers/checkAuth";
 import mongoose, { isValidObjectId } from "mongoose";
 import { ApiError } from "@/utils/ApiError";
 import User from "@/models/users.models";
+import practiceEntry from "@/models/practiceEntry.models";
 
 connectDB();
 
@@ -105,7 +106,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         }
         //later change this
 
-        if (!user.isVerified || user.role !== "Teacher") {
+        if (user.role !== "Teacher") {
             throw new ApiError(401, "User not authorized to mark the practice solution")
         }
 
@@ -119,11 +120,19 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             new: true
         });
 
-        const updatedUser = await User.findByIdAndUpdate(user._id, {
+        const updatedUser = await User.findByIdAndUpdate(updatedPracticeSolution?.student, {
             $inc: {
                 xps: marks
             }
-        })
+        },
+            {
+                new: true
+            }
+        );
+
+        if(!updatedUser){
+            throw new ApiError(404, "User not updated found");
+        }
 
         return NextResponse.
             json({
